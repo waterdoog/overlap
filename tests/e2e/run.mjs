@@ -22,7 +22,7 @@ const ROOT = resolve(fileURLToPath(new URL("../..", import.meta.url)));
 const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : dflt; };
 // --scripted: dev/script-router.mjs plays the model (no model calls, deterministic).
 const SCRIPTED = process.argv.includes("--scripted");
-const ROUTER = arg("--router", SCRIPTED ? "http://localhost:8198/v1" : "http://localhost:8199/v1");
+const ROUTER = arg("--router", SCRIPTED ? "http://127.0.0.1:8198/v1" : "http://127.0.0.1:8199/v1");
 const MODEL = arg("--model", SCRIPTED ? "scripted" : "gemini-4-neon");
 const OUT = arg("--out", join(ROOT, "tests", "e2e", "last-run"));
 const PEOPLE = [["ana", 9101], ["bo", 9102], ["cy", 9103]];
@@ -34,16 +34,20 @@ const START = Date.now();
 // --hosted: the three people are pages on one hosted Overlap site (/u/<id>/), created from
 // their iCal addresses; otherwise each is its own server on its own origin.
 const HOSTED = process.argv.includes("--hosted");
-for (const port of HOSTED ? [9200, 9299] : PEOPLE.map(([, p]) => p)) {
+// --live: the three public demo pages (resets their demo logs first). Needs the open network.
+const LIVE = process.argv.includes("--live");
+if (LIVE) process.env.E2E_OPEN_NETWORK = "1";
+for (const port of LIVE ? [] : HOSTED ? [9200, 9299] : PEOPLE.map(([, p]) => p)) {
   const busy = await fetch(`http://localhost:${port}/`).then(() => true, () => false);
   if (busy) { console.error(`Port ${port} is already in use; stop the old server first.`); process.exit(2); }
 }
-const procs = HOSTED
+const procs = LIVE ? [] : HOSTED
   ? [spawn("node", [join(ROOT, "dev", "serve-hosted.mjs"), "9200", "--allow-private-calendars"], { env: { ...process.env, DATA_DIR: dataDir }, stdio: "ignore" }),
      spawn("python3", ["-m", "http.server", "9299", "--bind", "127.0.0.1", "--directory", join(ROOT, "personas")], { stdio: "ignore" })]
   : PEOPLE.map(([p, port]) => spawn("node", [join(ROOT, "dev", "serve.mjs"), p, String(port)], { env: { ...process.env, DATA_DIR: dataDir }, stdio: "ignore" }));
 const BASE = {}; const KEY = {};
-if (!HOSTED) for (const [p, port] of PEOPLE) { BASE[p] = `http://localhost:${port}`; KEY[p] = JSON.parse(readFileSync(join(ROOT, "personas", `${p}.json`), "utf8")).dev_owner_key; }
+if (LIVE) for (const [p] of PEOPLE) { BASE[p] = `https://overlap-${p}.vercel.app`; KEY[p] = JSON.parse(readFileSync(join(ROOT, "personas", `${p}.json`), "utf8")).dev_owner_key; }
+else if (!HOSTED) for (const [p, port] of PEOPLE) { BASE[p] = `http://localhost:${port}`; KEY[p] = JSON.parse(readFileSync(join(ROOT, "personas", `${p}.json`), "utf8")).dev_owner_key; }
 const keyOf = (p) => KEY[p];
 async function createHostedPages() {
   await sleep(1000);
@@ -62,6 +66,7 @@ async function main() {
   mkdirSync(OUT, { recursive: true });
   await sleep(800);
   if (HOSTED) await createHostedPages();
+  if (LIVE) for (const [p] of PEOPLE) await fetch(`${BASE[p]}/api/owner/reset`, { method: "POST", headers: { Authorization: `Bearer ${KEY[p]}`, "Content-Type": "application/json" }, body: "{}" });
   if (await ChromeLauncher.answers(9333)) throw new Error("A browser is already on DevTools port 9333 (left by an earlier run); stop it first.");
   const chrome = new ChromeLauncher(ChromeLauncher.locate(), 9333, mkdtempSync(join(tmpdir(), "overlap-chrome-")), join(OUT, "chrome.log"));
   await chrome.start();

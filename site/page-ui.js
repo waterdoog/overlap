@@ -192,6 +192,13 @@ function demoBar() {
   Promise.all(d.people.map((u) => fetch(new URL("api/profile", u)).then((r) => r.json()).catch(() => null))).then((ps) => {
     $("#demo-links").replaceChildren(...ps.map((p, i) => { if (!p) return el("span"); const a = el("a", `${p.name.split(" ")[0]}'s page`, "small"); a.href = d.people[i]; return a; }));
   });
+  // No key? Point the runtime's settings at this site's scripted demo model (/v1, no AI).
+  $("#demo-scripted").addEventListener("click", () => {
+    document.querySelector("#agent-app details")?.setAttribute("open", "");
+    const set = (sel, v) => { const el = document.querySelector(sel); if (el) { el.value = v; el.dispatchEvent(new Event("input", { bubbles: true })); } };
+    set("#ns-router", `${location.origin}/v1`); set("#ns-model", "scripted"); set("#ns-key", "scripted-demo");
+    document.querySelector("#ns-apply")?.click();
+  });
   $("#demo-reset").addEventListener("click", async () => {
     await fetch(Api.url("/api/demo-reset"), { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
     page.refreshOwner();

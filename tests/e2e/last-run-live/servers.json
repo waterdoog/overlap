@@ -1,0 +1,48 @@
+{
+ "bo": {
+  "ok": true,
+  "profile": {
+   "name": "Bo Okafor",
+   "timezone": "Europe/London",
+   "answer_mode": "strict"
+  },
+  "budget": {
+   "per_page_per_day": 18,
+   "total_per_day": 84,
+   "pages_total_per_day": 60,
+   "pages_used_today": 0,
+   "unverified_total_per_day": 24,
+   "unverified_used_today": 0,
+   "used_today": 0,
+   "by_site": {}
+  },
+  "receipts": [],
+  "requests": [],
+  "calendar_feed": "/api/calendar.ics?token=86c3b2d0f6e3b0031f67fce8d89ea9e8",
+  "grants": {},
+  "pages": []
+ },
+ "cy": {
+  "ok": true,
+  "profile": {
+   "name": "Cy Tanaka",
+   "timezone": "America/Toronto",
+   "answer_mode": "strict"
+  },
+  "budget": {
+   "per_page_per_day": 18,
+   "total_per_day": 84,
+   "pages_total_per_day": 60,
+   "pages_used_today": 0,
+   "unverified_total_per_day": 24,
+   "unverified_used_today": 0,
+   "used_today": 0,
+   "by_site": {}
+  },
+  "receipts": [],
+  "requests": [],
+  "calendar_feed": "/api/calendar.ics?token=33083b6a040d02af9ecb3713bca17ad8",
+  "grants": {},
+  "pages": []
+ }
+}

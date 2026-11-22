@@ -3,6 +3,10 @@
   "outputDirectory": "hosted-out",
   "rewrites": [
     {
+      "source": "/v1/:rest*",
+      "destination": "/api/script?p=/v1/:rest*"
+    },
+    {
       "source": "/api/pages",
       "destination": "/api/hosted?p=/api/pages"
     },

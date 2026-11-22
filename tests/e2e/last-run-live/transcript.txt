@@ -1,0 +1,7 @@
+OWNER: Find 30 minutes next week with Bo and Cy for a pricing sync.
+
+ASSISTANT: ⚠️ Couldn’t connect to the local AI router at 127.0.0.1:8198. Check that it is running, that the URL is its OpenAI-compatible base URL, and that it allows browser requests from https://overlap-ana.vercel.app (CORS). This HTTPS page may also be blocked from calling a local HTTP service; if so, expose the router through an HTTPS proxy or tunnel.
+
+OWNER: Send requests for 2026-11-26 14:30-15:00 UTC titled Pricing sync
+
+ASSISTANT: ⚠️ Couldn’t connect to the local AI router at 127.0.0.1:8198. Check that it is running, that the URL is its OpenAI-compatible base URL, and that it allows browser requests from https://overlap-ana.vercel.app (CORS). This HTTPS page may also be blocked from calling a local HTTP service; if so, expose the router through an HTTPS proxy or tunnel.

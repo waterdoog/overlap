@@ -79,10 +79,15 @@ export class ChromeLauncher {
       "--use-mock-keychain",
       `--remote-debugging-port=${this.port}`,
       `--user-data-dir=${this.profile}`,
-      // Chrome sends loopback traffic directly and everything else to this closed port.
-      "--proxy-server=http://127.0.0.1:9",
-      // The rule names the IPv6 loopback without brackets: "EXCLUDE [::1]" does not match it.
-      "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost, EXCLUDE ::1",
+      // Chrome sends loopback traffic directly and everything else to this closed port,
+      // unless a live test against public pages asked for the open network.
+      // A live test's public pages call the local scripted router: allow that loopback call
+      // without the Local Network Access prompt, which a headless browser cannot answer.
+      ...(process.env.E2E_OPEN_NETWORK ? ["--disable-features=LocalNetworkAccessChecks,PrivateNetworkAccessRespectPreflightResults,BlockInsecurePrivateNetworkRequests"] : [
+        "--proxy-server=http://127.0.0.1:9",
+        // The rule names the IPv6 loopback without brackets: "EXCLUDE [::1]" does not match it.
+        "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost, EXCLUDE ::1",
+      ]),
       "--disable-background-networking",
       "--disable-component-update",
       "--disable-sync",

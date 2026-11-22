@@ -14,7 +14,19 @@ Allow
 Always allow
 Decline
 
-ASSISTANT: CALLER_FINAL: person_1: {"cruse":1,"text":"PASS_ANSWER: {\"action\":\"http://localhost:9102/overlap_pass#check_windows\",\"requestId\":\"6b5a4ad3-ff14-4acb-a724-b39ed6aeaaa3:0\",\"status\":\"succeeded\",\"result\":{\"ok\":true,\"owner\":\"Bo Okafor\",\"owner_timezone\":\"Europe/London\",\"answer_mode\":\"strict\",\"answers\":[{\"start\":\"2026-11-23T15:00:00.000Z\",\"end\":\"2026-11-23T15:30:00.000Z\",\"local\":\"Mon 23 Nov, 15:00\",\"available\":true},{\"start\":\"2026-11-23T15:30:00.000Z\",\"end\":\"2026-11-23T16:00:00.000Z\",\"local\":\"Mon 23 Nov, 15:30\",\"available\":true},{\"start\":\"2026-11-25T14:00:00.000Z\",\"end\":\"2026-11-25T14:30:00.000Z\",\"local\":\"Wed 25 Nov, 14:00\",\"available\":true},{\"start\":\"2026-11-25T15:30:00.000Z\",\"end\":\"2026-11-25T16:00:00.000Z\",\"local\":\"Wed 25 Nov, 15:30\",\"available\":false},{\"start\":\"2026-11-26T14:00:00.000Z\",\"end\":\"2026-11-26T14:30:00.000Z\",\"local\":\"Thu 26 Nov, 14:00\",\"available\":false},{\"start\":\"2026-11-26T14:30:00.000Z\",\"end\":\"2026-11-26T15:00:00.000Z\",\"local\":\"Thu 26 Nov, 14:30\",\"available\":true}],\"suggestions\":[],\"budget_left\":12,\"note\":\"Yes or no for each window asked, nothing more. Bo Okafor's calendar is never shared.\"}}","presentation":null,"source":{"origin":"localhost:9102","network":"overlap_pass","agent":"pass_agent","invocation":"cruse-2"}} | person_2: {"cruse":1,"text":"PASS_ANSWER: {\"action\":\"http://localhost:9103/overlap_pass#check_windows\",\"requestId\":\"c622d492-9a0d-4e3c-8e85-3f9c4a2c76cc:0\",\"status\":\"succeeded\",\"result\":{\"ok\":true,\"owner\":\"Cy Tanaka\",\"owner_timezone\":\"America/Toronto\",\"answer_mode\":\"strict\",\"answers\":[{\"start\":\"2026-11-23T15:00:00.000Z\",\"end\":\"2026-11-23T15:30:00.000Z\",\"local\":\"Mon 23 Nov, 10:00\",\"available\":false},{\"start\":\"2026-11-23T15:30:00.000Z\",\"end\":\"2026-11-23T16:00:00.000Z\",\"local\":\"Mon 23 Nov, 10:30\",\"available\":false},{\"start\":\"2026-11-25T14:00:00.000Z\",\"end\":\"2026-11-25T14:30:00.000Z\",\"local\":\"Wed 25 Nov, 09:00\",\"available\":false},{\"start\":\"2026-11-25T15:30:00.000Z\",\"end\":\"2026-11-25T16:00:00.000Z\",\"local\":\"Wed 25 Nov, 10:30\",\"available\":false},{\"start\":\"2026-11-26T14:00:00.000Z\",\"end\":\"2026-11-26T14:30:00.000Z\",\"local\":\"Thu 26 Nov, 09:00\",\"available\":false},{\"start\":\"2026-11-26T14:30:00.000Z\",\"end\":\"2026-11-26T15:00:00.000Z\",\"local\":\"Thu 26 Nov, 09:30\",\"available\":true}],\"suggestions\":[],\"budget_left\":12,\"note\":\"Yes or no for each window asked, nothing more. Cy Tanaka's calendar is never shared.\"}}","presentation":null,"source":{"origin":"localhost:9103","network":"overlap_pass","agent":"pass_agent","invocation":"cruse-3"}}
+ASSISTANT: I asked each person's page about 6 times; each page answered only yes or no.
+
+Your time (Europe/Stockholm)	Bo Okafor	Cy Tanaka
+Mon 23 Nov, 16:00	free	not free
+Mon 23 Nov, 16:30	free	not free
+Wed 25 Nov, 15:00	free	not free
+Wed 25 Nov, 16:30	not free	not free
+Thu 26 Nov, 15:00	not free	not free
+Thu 26 Nov, 15:30	free	free
+
+Works for everyone: Thu 26 Nov, 15:30 (UTC window: 2026-11-26 14:30-15:00 UTC). Say "send the requests" to ask each person's page.
+
+_Scripted demo model: no AI, it follows a fixed script so you can see the protocol. Connect a real model in ⚙ AI model settings for the real assistant._
 
 OWNER: Send requests for 2026-11-26 14:30-15:00 UTC titled Pricing sync
 
@@ -54,4 +66,9 @@ Thursday 26 November at 09:30–10:00 (America/Toronto)
 Your time
 Thursday 26 November at 09:30–10:00 (America/New_York)
 
-ASSISTANT: CALLER_FINAL: person_1: {"cruse":1,"text":"PASS_ANSWER: {\"action\":\"http://localhost:9102/overlap_pass#request_meeting\",\"requestId\":\"0d0382a8-1803-409e-8c8b-cfc32e4fba32:0\",\"status\":\"succeeded\",\"result\":{\"ok\":true,\"reference\":\"OV-5053CF\",\"status\":\"pending\",\"start\":\"2026-11-26T14:30:00.000Z\",\"end\":\"2026-11-26T15:00:00.000Z\",\"summary\":\"Request OV-5053CF sent to Bo Okafor for Thursday 26 November at 14:30–15:00 (Europe/London). Pending until Bo Okafor accepts.\",\"note\":\"The visitor typed their details in this person's window, which has now closed.\"}}","presentation":null,"source":{"origin":"localhost:9102","network":"overlap_pass","agent":"pass_agent","invocation":"cruse-5"}} | person_2: {"cruse":1,"text":"PASS_ANSWER: {\"action\":\"http://localhost:9103/overlap_pass#request_meeting\",\"requestId\":\"a4c91200-4448-4ae5-9b73-7820a7126b71:0\",\"status\":\"succeeded\",\"result\":{\"ok\":true,\"reference\":\"OV-7115BA\",\"status\":\"pending\",\"start\":\"2026-11-26T14:30:00.000Z\",\"end\":\"2026-11-26T15:00:00.000Z\",\"summary\":\"Request OV-7115BA sent to Cy Tanaka for Thursday 26 November at 09:30–10:00 (America/Toronto). Pending until Cy Tanaka accepts.\",\"note\":\"The visitor typed their details in this person's window, which has now closed.\"}}","presentation":null,"source":{"origin":"localhost:9103","network":"overlap_pass","agent":"pass_agent","invocation":"cruse-6"}}
+ASSISTANT: Bo Okafor: request OV-A7C226 sent, pending until they accept.
+Cy Tanaka: request OV-312EE2 sent, pending until they accept.
+
+Each request was made on that person's own page; once they accept, their page offers a calendar invite (.ics).
+
+_Scripted demo model: no AI, it follows a fixed script so you can see the protocol. Connect a real model in ⚙ AI model settings for the real assistant._
