@@ -219,3 +219,14 @@ test("hosted pages from busy times only: no titles reach the host, owner can ref
   assert.equal(ans2.answers[0].available, false, "refreshed busy times apply");
   assert.match(busyToIcs([[0, 60000]]), /DTSTART:19700101T000000Z/);
 });
+
+test("accepting re-checks the calendar: a conflict that appeared since the request is refused", async () => {
+  let ics = readFileSync(new URL("../personas/bo.ics", import.meta.url), "utf8");
+  const srv = new OwnerServer({ profile: people[1], store: new MemoryStore(), ownerKey: "k", now: () => NOW, loadCalendar: async () => ics });
+  const r = (await srv.handle({ method: "POST", path: "/api/request", body: { start: "2026-11-26T14:30:00Z", end: "2026-11-26T15:00:00Z", title: "Sync", from_name: "Ana", from_email: "a@example.com", caller_origin: "https://ana.example" } })).body;
+  assert.equal(r.ok, true);
+  ics = ics.replace("END:VCALENDAR", "BEGIN:VEVENT\nUID:new\nDTSTART:20261126T143000Z\nDTEND:20261126T153000Z\nSUMMARY:Dentist\nEND:VEVENT\nEND:VCALENDAR");
+  const d = (await srv.handle({ method: "POST", path: "/api/owner/decide", headers: { authorization: "Bearer k" }, body: { ref: r.reference, decision: "accepted" } })).body;
+  assert.equal(d.ok, false); assert.equal(d.conflict, true);
+  assert.equal(JSON.stringify(d).includes("Dentist"), false);
+});

@@ -85,7 +85,7 @@ function renderOwner() {
       const acts = el("div", "", "actions");
       for (const [d, txt] of [["accepted", "Accept"], ["declined", "Decline"]]) {
         const b = el("button", txt, d === "declined" ? "secondary" : ""); b.type = "button";
-        b.addEventListener("click", async () => { await Api.decide(r.ref, d); page.refreshOwner(); });
+        b.addEventListener("click", async () => { const out = await Api.decide(r.ref, d); if (!out.ok) alert(out.reason); page.refreshOwner(); });
         acts.append(b);
       }
       li.append(acts);

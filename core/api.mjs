@@ -296,11 +296,20 @@ export class OwnerServer {
   }
 
   async decide(body) {
+    // Re-read the calendar before accepting: it may have changed since the request came in.
+    this.cache = null;
+    const events = await this.events();
     return this.store.update((state) => {
       const r = state.requests.find((x) => x.ref === body.ref);
       if (!r) return { ok: false, reason: "No request with that reference." };
       if (r.status !== "pending") return { ok: false, reason: `That request is already ${r.status}.` };
       if (!["accepted", "declined"].includes(body.decision)) return { ok: false, reason: "Decide accepted or declined." };
+      if (body.decision === "accepted") {
+        const others = state.requests.filter((x) => x.status === "accepted" && x.ref !== r.ref);
+        if (!isFree(this.effectiveProfile(state), events, others, Date.parse(r.start), Date.parse(r.end))) {
+          return { ok: false, conflict: true, reason: "You are no longer free then: your calendar or another accepted meeting now overlaps. Decline it, or accept after freeing the time." };
+        }
+      }
       r.status = body.decision;
       r.decided = this.now();
       if (r.status === "accepted") OwnerServer.bump(state, "accept", r.decided);
