@@ -3,6 +3,10 @@
   "outputDirectory": "hosted-out",
   "rewrites": [
     {
+      "source": "/llm/v1/:rest*",
+      "destination": "/api/llm?p=/llm/v1/:rest*"
+    },
+    {
       "source": "/v1/:rest*",
       "destination": "/api/script?p=/v1/:rest*"
     },

@@ -190,6 +190,23 @@ function ownerControls() {
   setInterval(() => { if (page.owner && document.visibilityState === "visible") page.refreshOwner(); }, 5000);
 }
 
+async function sendDemo() {
+  for (let i = 0; i < 60 && !(window.overlapEngine && document.querySelector("#ns-input")); i++) await new Promise((r) => setTimeout(r, 250));
+  const input = document.querySelector("#ns-input");
+  if (!input) return;
+  document.querySelector(".assistant")?.scrollIntoView({ behavior: "smooth" });
+  input.value = "Find 30 minutes next week with Bo and Cy for a pricing sync.";
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  [...document.querySelectorAll("#agent-app button")].find((b) => b.textContent.trim() === "Send")?.click();
+}
+
+async function usageLine() {
+  const s = await Api.call("GET", "/api/stats").catch(() => null);
+  if (!s?.ok) return;
+  const w = s.last_7_days || {};
+  $("#usage-line").textContent = `Last 7 days (anonymous counts): ${w.check || 0} availability questions answered, ${w.request || 0} meeting requests, ${w.demo || 0} demo runs.`;
+}
+
 function demoBar() {
   const d = page.profile.demo;
   if (!d) return;
@@ -202,13 +219,33 @@ function demoBar() {
   Promise.all(d.people.map((u) => fetch(new URL("api/profile", u)).then((r) => r.json()).catch(() => null))).then((ps) => {
     $("#demo-links").replaceChildren(...ps.map((p, i) => { if (!p) return el("span"); const a = el("a", `${p.name.split(" ")[0]}'s page`, "small"); a.href = d.people[i]; return a; }));
   });
-  // No key? Point the runtime's settings at this site's scripted demo model (/v1, no AI).
-  $("#demo-scripted").addEventListener("click", () => {
+  // No key? Point the runtime's settings at a model on this site: the scripted demo (/v1, no
+  // AI) or the free, rate-limited real model (/llm/v1). Saving the settings reloads the page.
+  const connect = (router, model, key) => {
     document.querySelector("#agent-app details")?.setAttribute("open", "");
     const set = (sel, v) => { const el = document.querySelector(sel); if (el) { el.value = v; el.dispatchEvent(new Event("input", { bubbles: true })); } };
-    set("#ns-router", `${location.origin}/v1`); set("#ns-model", "scripted"); set("#ns-key", "scripted-demo");
+    set("#ns-router", router); set("#ns-model", model); set("#ns-key", key);
     document.querySelector("#ns-apply")?.click();
+  };
+  $("#demo-scripted").addEventListener("click", () => connect(`${location.origin}/v1`, "scripted", "scripted-demo"));
+  $("#demo-free").addEventListener("click", async () => {
+    const m = await fetch("llm/v1/models").then((r) => r.json()).catch(() => null);
+    if (!m?.data?.length) { alert("The free AI model is not available right now. Use the scripted demo, or connect your own model in AI model settings."); return; }
+    connect(`${location.origin}/llm/v1`, m.data[0].id, "free-demo");
   });
+  // The 30-second demo: sign in as the demo owner, add the other two people, connect the
+  // scripted model, and send the scheduling request. The visitor approves the two cards.
+  $("#demo-run").addEventListener("click", async () => {
+    await page.signIn(d.owner_key);
+    if (!page.people.length) for (const u of d.people) await page.addPerson(u);
+    fetch(Api.url("/api/stats"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demo" }) }).catch(() => {});
+    try { sessionStorage.setItem("overlap-demo-run", "1"); } catch {}
+    if (window.overlapEngine?.modelOverride === "scripted") return sendDemo();
+    connect(`${location.origin}/v1`, "scripted", "scripted-demo");
+  });
+  let pending = false;
+  try { pending = sessionStorage.getItem("overlap-demo-run") === "1"; } catch {}
+  if (pending) { try { sessionStorage.removeItem("overlap-demo-run"); } catch {} sendDemo(); }
   $("#demo-reset").addEventListener("click", async () => {
     await fetch(Api.url("/api/demo-reset"), { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
     page.refreshOwner();
@@ -218,6 +255,7 @@ function demoBar() {
 await page.ready;
 renderProfile();
 demoBar();
+usageLine();
 manualForm();
 ownerControls();
 page.onChange(renderOwner);

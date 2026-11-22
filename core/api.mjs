@@ -65,6 +65,8 @@ export class OwnerServer {
       const route = `${method} ${path.replace(/\/+$/, "")}`;
       switch (route) {
         case "GET /api/profile": return ok(await this.publicProfile());
+        case "GET /api/stats": return ok(await this.statsView());
+        case "POST /api/stats": return ok(await this.count(body.event === "demo" ? "demo" : null));
         case "GET /api/key": return this.pageKey ? ok({ ok: true, page: this.base, ...this.pageKey.publicJwk() }) : { status: 404, body: { ok: false, reason: "No key." } };
         case "POST /api/check": return ok(await this.check(body));
         case "POST /api/request": return ok(await this.request(body));
@@ -155,6 +157,30 @@ export class OwnerServer {
     });
   }
 
+  // Anonymous usage: counts of events per day, nothing about who or what.
+  static bump(state, event, now) {
+    if (!event) return;
+    const day = new Date(now).toISOString().slice(0, 10);
+    state.stats = state.stats || {};
+    const d = (state.stats[day] ||= {});
+    d[event] = (d[event] || 0) + 1;
+    for (const k of Object.keys(state.stats).sort().slice(0, -60)) delete state.stats[k];
+  }
+
+  async count(event) {
+    if (!event) return { ok: false, reason: "Unknown event." };
+    return this.store.update((state) => { OwnerServer.bump(state, event, this.now()); return { ok: true }; });
+  }
+
+  async statsView() {
+    const state = await this.store.load();
+    const days = Object.entries(state.stats || {}).sort(([a], [b]) => a.localeCompare(b));
+    const total = {}, week = {};
+    const since = new Date(this.now() - 7 * 864e5).toISOString().slice(0, 10);
+    for (const [day, ev] of days) for (const [k, n] of Object.entries(ev)) { total[k] = (total[k] || 0) + n; if (day >= since) week[k] = (week[k] || 0) + n; }
+    return { ok: true, note: "Anonymous counts of events per day (questions answered, requests, acceptances, demo runs). Nothing about who asked or what.", last_7_days: week, all_time: total, by_day: Object.fromEntries(days) };
+  }
+
   async check(body) {
     const events = await this.events();
     const verifiedPage = await this.verified(body);
@@ -164,6 +190,7 @@ export class OwnerServer {
         callerOrigin: cleanOrigin(body.caller_origin), ip: this.ip, purpose: body.purpose, now: this.now(),
       }, body.windows);
       if (receipt) state.receipts.push({ kind: "check", ...receipt });
+      if (result.ok) OwnerServer.bump(state, "check", this.now());
       return result;
     });
   }
@@ -195,6 +222,7 @@ export class OwnerServer {
       state.receipts.push({ kind: "request", at: now, caller: verifiedPage || caller, page: verifiedPage, verified: !!verifiedPage, ip: this.ip, purpose: title, asked: [{ start: iso(w.start), end: iso(w.end) }], answers: [free], suggestions: [], cost: 1, refused: false });
       if (!free) return { ok: false, reason: `${profile.name} is not free then any more. Ask about other times.` };
       const ref = `OV-${randomBytes(3).toString("hex").toUpperCase()}`;
+      OwnerServer.bump(state, "request", now);
       state.requests.push({
         ref, status: "pending", created: now, caller, start: iso(w.start), end: iso(w.end), title,
         from_name: fromName, from_email: fromEmail, from_page: verifiedPage || "", note: String(body.note || "").slice(0, 400),
@@ -275,6 +303,7 @@ export class OwnerServer {
       if (!["accepted", "declined"].includes(body.decision)) return { ok: false, reason: "Decide accepted or declined." };
       r.status = body.decision;
       r.decided = this.now();
+      if (r.status === "accepted") OwnerServer.bump(state, "accept", r.decided);
       return { ok: true, reference: r.ref, status: r.status };
     });
   }
@@ -291,6 +320,7 @@ export class OwnerServer {
   }
 
   async reset() {
+    // Clears the demo log; anonymous usage counts stay.
     return this.store.update((state) => { state.receipts = []; state.requests = []; state.grants = {}; return { ok: true }; });
   }
 }

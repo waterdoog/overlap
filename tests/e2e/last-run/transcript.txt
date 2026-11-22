@@ -66,8 +66,8 @@ Thursday 26 November at 09:30–10:00 (America/Toronto)
 Your time
 Thursday 26 November at 09:30–10:00 (America/New_York)
 
-ASSISTANT: Bo Okafor: request OV-0B43B1 sent, pending until they accept.
-Cy Tanaka: request OV-353A06 sent, pending until they accept.
+ASSISTANT: Bo Okafor: request OV-A289A9 sent, pending until they accept.
+Cy Tanaka: request OV-77626F sent, pending until they accept.
 
 Each request was made on that person's own page; once they accept, their page offers a calendar invite (.ics).
 
