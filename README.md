@@ -12,6 +12,10 @@ Bo's page and Cy's page, in Ana's browser, on Ana's own AI key, after Ana approv
 - The rule "answer only what was asked" is enforced by each owner's server, not by a prompt.
 - Every question leaves a receipt the owner can read: who asked, which times, what was answered.
 
+**Live:** [Ana's page](https://overlap-ana.vercel.app/) · [Bo's page](https://overlap-bo.vercel.app/) ·
+[Cy's page](https://overlap-cy.vercel.app/) (three origins; the demo bar signs you in and has a
+no-key scripted demo) · [Get your own page](https://overlap-pages.vercel.app/)
+
 Built on the [Open Agentic Web MVP spec](https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/worldwide_agentic_web_mvp_spec.md)
 (Profile 0.3) and its reference browser runtime.
 
