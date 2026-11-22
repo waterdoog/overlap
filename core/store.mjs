@@ -67,7 +67,8 @@ export class BlobStore {
     const { get } = await this.sdk();
     const r = await get(this.path, { access: "private", useCache: false, token: this.token }).catch((e) => { if (/not.?found/i.test(String(e?.name || e?.message))) return null; throw e; });
     if (!r || r.statusCode !== 200) { this.etag = null; return EMPTY(); }
-    this.etag = r.blob?.etag || r.etag || null;
+    // get() returns a weak ETag (W/"…"); conditional writes need the strong form.
+    this.etag = (r.blob?.etag || r.etag || "").replace(/^W\//, "") || null;
     const text = await new Response(r.stream).text();
     try { return { ...EMPTY(), ...JSON.parse(text) }; } catch { return EMPTY(); }
   }
