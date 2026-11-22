@@ -1,3 +1,4 @@
+
 // Renders the page from App.page: profile, rules, the manual check form and the owner's
 // panels. Works without the assistant.
 import { App } from "./app.js";
@@ -8,6 +9,20 @@ const page = App.page;
 const $ = (s) => document.querySelector(s);
 const el = (tag, text = "", cls = "") => { const e = document.createElement(tag); if (text) e.textContent = text; if (cls) e.className = cls; return e; };
 const myTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+function icsTime(isoStr) { return new Date(isoStr).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); }
+
+function calendarAddLinks(r, ownerName) {
+  if (r.google_calendar && r.outlook_calendar) return { google: r.google_calendar, outlook: r.outlook_calendar };
+  const details = `Meeting between ${ownerName} and ${r.from_name || "guest"}. Reference ${r.ref || r.reference}.`;
+  const dates = `${icsTime(r.start)}/${icsTime(r.end)}`;
+  const startIso = new Date(r.start).toISOString();
+  const endIso = new Date(r.end).toISOString();
+  return {
+    google: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(r.title)}&dates=${encodeURIComponent(dates)}&details=${encodeURIComponent(details)}`,
+    outlook: `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(r.title)}&startdt=${encodeURIComponent(startIso)}&enddt=${encodeURIComponent(endIso)}&body=${encodeURIComponent(details)}`,
+  };
+}
 
 function renderProfile() {
   const p = page.profile;
@@ -26,7 +41,8 @@ function renderProfile() {
   $("#r-mode").textContent = p.answer_mode === "helpful"
     ? "If none of the asked times is free, it may suggest up to two nearby free times."
     : "No suggestions: only the answer to the question asked.";
-  $("#r-budget").textContent = `Up to ${p.rules.max_windows_per_question} times per question. A page that proves who it is gets ${p.rules.per_page_per_day} answers a day; everyone else shares ${p.rules.unverified_total_per_day}. At most ${p.rules.per_week_total} answers about any one week, however many ask.`;
+  $("#r-budget").textContent = `Up to ${p.rules.max_windows_per_question} times per question. A page that proves who it is gets ${p.rules.per_page_per_day} answers a day; everyone else shares ${p.rules.unverified_total_per_day}. At most ${p.rules.per_week_total} answers about any one week, however many ask.`
+    + (p.rules.min_notice_hours ? ` At least ${p.rules.min_notice_hours}h notice.` : "");
   $("#your-tz").textContent = myTz;
 }
 
@@ -54,11 +70,59 @@ function manualForm() {
   });
 }
 
+function ensureExtraSettingsControls() {
+  if ($("#owner-extra-settings")) return;
+  const seg = $(".seg");
+  if (!seg || !seg.parentElement) return;
+  const wrap = el("div", "", "owner-settings small");
+  wrap.id = "owner-extra-settings";
+
+  const autoWrap = el("label", "", "small");
+  const autoCb = document.createElement("input");
+  autoCb.type = "checkbox";
+  autoCb.id = "set-auto-accept";
+  autoWrap.append(autoCb, document.createTextNode(" Auto-accept trusted pages"));
+
+  const holdWrap = el("label", "", "small");
+  const holdCb = document.createElement("input");
+  holdCb.type = "checkbox";
+  holdCb.id = "set-hold-pending";
+  holdWrap.append(holdCb, document.createTextNode(" Hold pending slots"));
+
+  const noticeWrap = el("label", "", "small");
+  noticeWrap.append(document.createTextNode("Min notice (h) "));
+  const noticeIn = document.createElement("input");
+  Object.assign(noticeIn, { type: "number", id: "set-min-notice", min: "0", max: "168", step: "1" });
+  noticeIn.style.width = "4.5em";
+  noticeWrap.append(noticeIn);
+
+  autoCb.addEventListener("change", async () => {
+    await Api.settings({ auto_accept_trusted: autoCb.checked });
+    page.refreshOwner();
+  });
+  holdCb.addEventListener("change", async () => {
+    await Api.settings({ hold_pending: holdCb.checked });
+    page.refreshOwner();
+  });
+  noticeIn.addEventListener("change", async () => {
+    const v = Math.max(0, Math.min(168, Number(noticeIn.value) || 0));
+    noticeIn.value = String(v);
+    await Api.settings({ min_notice_hours: v });
+    page.profile = await Api.profile();
+    renderProfile();
+    page.refreshOwner();
+  });
+
+  wrap.append(autoWrap, document.createTextNode(" · "), holdWrap, document.createTextNode(" · "), noticeWrap);
+  seg.insertAdjacentElement("afterend", wrap);
+}
+
 function renderOwner() {
   const box = $("#owner");
   box.hidden = !page.owner;
   $("#owner-toggle").textContent = page.owner ? "Signed in as owner" : "Owner sign-in";
   if (!page.owner) return;
+  ensureExtraSettingsControls();
   // People
   $("#people-list").replaceChildren(...page.people.map((x) => {
     const li = el("li", "", "person");
@@ -81,6 +145,15 @@ function renderOwner() {
     t.append(el("strong", r.title), el("div", `${label(Date.parse(r.start), page.profile.timezone)}–${label(Date.parse(r.end), page.profile.timezone, false)} · from ${r.from_name}${r.from_email ? ` <${r.from_email}>` : ""} via ${r.from_page ? `their Overlap page ${hostOf(r.from_page)}` : hostOf(r.caller)}`, "muted small"));
     if (r.note) t.append(el("div", `“${r.note}”`, "small"));
     li.append(t);
+    const makeCancelBtn = () => {
+      const cb = el("button", "Cancel", "secondary small-btn"); cb.type = "button";
+      cb.addEventListener("click", async () => {
+        const out = await Api.call("POST", "/api/owner/cancel", { ref: r.ref }, { owner: true });
+        if (!out.ok) alert(out.reason);
+        page.refreshOwner();
+      });
+      return cb;
+    };
     if (r.status === "pending") {
       const acts = el("div", "", "actions");
       for (const [d, txt] of [["accepted", "Accept"], ["declined", "Decline"]]) {
@@ -88,10 +161,17 @@ function renderOwner() {
         b.addEventListener("click", async () => { const out = await Api.decide(r.ref, d); if (!out.ok) alert(out.reason); page.refreshOwner(); });
         acts.append(b);
       }
+      acts.append(makeCancelBtn());
       li.append(acts);
     } else {
       li.append(el("span", `${r.status} · ${r.ref}`, `pill ${r.status}`));
-      if (r.status === "accepted") { const a = el("a", "Invite (.ics)", "small"); a.href = Api.url(`/api/invite.ics?ref=${r.ref}`); li.append(a); }
+      if (r.status === "accepted") {
+        const a = el("a", "Invite (.ics)", "small"); a.href = Api.url(`/api/invite.ics?ref=${r.ref}`);
+        const links = calendarAddLinks(r, page.profile.name);
+        const g = el("a", "Google", "small"); g.href = links.google; g.target = "_blank"; g.rel = "noopener noreferrer";
+        const o = el("a", "Outlook", "small"); o.href = links.outlook; o.target = "_blank"; o.rel = "noopener noreferrer";
+        li.append(a, g, o, makeCancelBtn());
+      }
     }
     return li;
   }) : [el("li", "No requests yet.", "muted")]));
@@ -111,7 +191,7 @@ function renderOwner() {
     sel.setAttribute("aria-label", `Access for ${pg}`);
     for (const [v, t] of [["default", `Default (${ov.budget.per_page_per_day}/day)`], ["trusted", "Trusted (36/day, no weekly cap)"], ["blocked", "Blocked"]]) sel.append(Object.assign(document.createElement("option"), { value: v, textContent: t }));
     const g = grants[pg];
-    sel.value = g?.blocked ? "blocked" : g?.per_day === 36 ? "trusted" : "default";
+    sel.value = g?.blocked ? "blocked" : g?.trusted || g?.per_day === 36 ? "trusted" : "default";
     sel.addEventListener("change", async () => {
       await Api.grant(sel.value === "default" ? { page: pg, reset: true } : sel.value === "blocked" ? { page: pg, blocked: true } : { page: pg, per_day: 36, trusted: true });
       page.refreshOwner();
@@ -119,8 +199,14 @@ function renderOwner() {
     li.append(sel);
     return li;
   }) : [el("li", "No page has asked with a signed assertion yet.", "muted small")]));
-  // Mode
+  // Mode & extra settings
   for (const btn of document.querySelectorAll(".seg button")) btn.setAttribute("aria-checked", String(btn.dataset.mode === ov.profile.answer_mode));
+  const autoCb = $("#set-auto-accept");
+  if (autoCb) autoCb.checked = !!ov.profile.auto_accept_trusted;
+  const holdCb = $("#set-hold-pending");
+  if (holdCb) holdCb.checked = ov.profile.hold_pending !== false;
+  const noticeIn = $("#set-min-notice");
+  if (noticeIn && document.activeElement !== noticeIn) noticeIn.value = String(ov.profile.min_notice_hours || 0);
   // Receipts
   $("#receipt-rows").replaceChildren(...(ov.receipts.length ? ov.receipts.slice(0, 30).map((r) => {
     const tr = el("tr");

@@ -6,7 +6,7 @@
   "type": "module",
   "engines": { "node": ">=22" },
   "scripts": {
-    "test": "node --test tests/core.test.mjs",
+    "test": "node --test tests/core.test.mjs tests/features.test.mjs",
     "build:check": "node dev/build.mjs --check"
   },
   "dependencies": {

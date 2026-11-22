@@ -1,3 +1,4 @@
+
 // The answer rule, enforced in code on the owner's server.
 //
 // A caller may ask "is the owner free in these exact windows?". The answer is yes or no per
@@ -35,6 +36,11 @@ export function budgetOf(profile) {
   return { ...DEFAULT_BUDGET, ...(profile.budget || {}) };
 }
 
+export function minNoticeMs(profile) {
+  const h = Number(profile.min_notice_hours || 0);
+  return Number.isFinite(h) && h > 0 ? h * HOUR : 0;
+}
+
 /**
  * Format an instant in the owner's time zone, for answers ("Tue 25 Nov 10:00").
  */
@@ -46,12 +52,12 @@ export function localLabel(ts, timeZone) {
 
 /**
  * Busy intervals the owner's page knows about: calendar events (with buffer) plus
- * meeting requests the owner accepted.
+ * meeting requests that block time (accepted, and optionally pending holds).
  */
-export function blockedIntervals(profile, events, accepted, from, to) {
+export function blockedIntervals(profile, events, blocking, from, to) {
   const buffer = (profile.buffer_minutes || 0) * MIN;
   const busy = busyIntervals(events, from - DAY, to + DAY).map(([s, e]) => [s - buffer, e + buffer]);
-  for (const r of accepted || []) busy.push([Date.parse(r.start) - buffer, Date.parse(r.end) + buffer]);
+  for (const r of blocking || []) busy.push([Date.parse(r.start) - buffer, Date.parse(r.end) + buffer]);
   return busy.sort((a, b) => a[0] - b[0]);
 }
 
@@ -62,10 +68,13 @@ function meetingsOnDay(profile, events, accepted, dayStart) {
 }
 
 /**
- * Is the owner free for the whole window? Checks working hours, protected blocks, the
- * daily meeting cap and busy time. Returns a boolean only: the reason never leaves.
+ * Is the owner free for the whole window? Checks minimum notice (when `now` is given),
+ * working hours, protected blocks, the daily meeting cap and busy time.
+ * `blocking` defaults to `accepted` when not passed separately (e.g. for tentative holds).
+ * Returns a boolean only: the reason never leaves.
  */
-export function isFree(profile, events, accepted, start, end) {
+export function isFree(profile, events, accepted, start, end, now = null, blocking = accepted) {
+  if (now !== null && start < now + minNoticeMs(profile)) return false;
   const tz = profile.timezone || "UTC";
   const a = zonedParts(start, tz);
   const b = zonedParts(end - 1, tz);
@@ -82,7 +91,7 @@ export function isFree(profile, events, accepted, start, end) {
   }
   const dayStart = zonedToUtc(a.y, a.mo, a.d, 0, 0, tz);
   if (profile.max_meetings_per_day && meetingsOnDay(profile, events, accepted, dayStart) >= profile.max_meetings_per_day) return false;
-  for (const [s, e] of blockedIntervals(profile, events, accepted, start, end)) {
+  for (const [s, e] of blockedIntervals(profile, events, blocking, start, end)) {
     if (s < end && e > start) return false;
   }
   return true;
@@ -119,7 +128,7 @@ export function validateWindows(profile, raw, now) {
 /**
  * Nearby free windows of the same length, on the days asked about, for helpful mode.
  */
-export function suggest(profile, events, accepted, windows, limit, now) {
+export function suggest(profile, events, accepted, windows, limit, now, blocking = accepted) {
   if (limit <= 0) return [];
   const tz = profile.timezone || "UTC";
   const len = windows[0].end - windows[0].start;
@@ -131,13 +140,25 @@ export function suggest(profile, events, accepted, windows, limit, now) {
     const candidates = [];
     for (let s = day; s < day + DAY; s += 30 * MIN) {
       if (s < now || asked.has(s)) continue;
-      if (isFree(profile, events, accepted, s, s + len)) candidates.push(s);
+      if (isFree(profile, events, accepted, s, s + len, now, blocking)) candidates.push(s);
     }
     candidates.sort((x, y) => Math.abs(x - ref) - Math.abs(y - ref));
     for (const s of candidates.slice(0, limit)) found.push({ start: s, end: s + len });
   }
   found.sort((x, y) => x.start - y.start);
   return found.slice(0, limit);
+}
+
+/**
+ * Requests that count as busy when answering a caller. When hold_pending is true (default),
+ * pending requests from OTHER verified callers also hold their slots against collisions.
+ */
+export function blockingRequestsFor(profile, state, verifiedPage) {
+  const reqs = state.requests || [];
+  const accepted = reqs.filter((r) => r.status === "accepted");
+  if (profile.hold_pending === false) return { accepted, blocking: accepted };
+  const held = reqs.filter((r) => r.status === "pending" && r.verified && (!verifiedPage || r.from_page !== verifiedPage));
+  return { accepted, blocking: accepted.concat(held) };
 }
 
 /**
@@ -208,12 +229,12 @@ export function answerQuestion(ctx, rawWindows) {
       },
     };
   }
-  const accepted = (state.requests || []).filter((r) => r.status === "accepted");
-  const answers = windows.map((w) => ({ start: iso(w).start, end: iso(w).end, local: localLabel(w.start, profile.timezone), available: isFree(profile, events, accepted, w.start, w.end) }));
+  const { accepted, blocking } = blockingRequestsFor(profile, state, page);
+  const answers = windows.map((w) => ({ start: iso(w).start, end: iso(w).end, local: localLabel(w.start, profile.timezone), available: isFree(profile, events, accepted, w.start, w.end, now, blocking) }));
   const mode = profile.answer_mode === "helpful" ? "helpful" : "strict";
   let suggestions = [];
   if (mode === "helpful" && !answers.some((a) => a.available)) {
-    suggestions = suggest(profile, events, accepted, windows, Math.min(2, left - windows.length), now)
+    suggestions = suggest(profile, events, accepted, windows, Math.min(2, left - windows.length), now, blocking)
       .map((w) => ({ ...iso(w), local: localLabel(w.start, profile.timezone) }));
   }
   const cost = windows.length + suggestions.length;
@@ -244,6 +265,7 @@ function iso(w) {
 
 /**
  * Free windows for the owner's own assistant (only with the owner key).
+ * Pending requests do NOT block the owner's own view.
  */
 export function ownerFreeWindows(profile, events, state, from, to, minutes, now) {
   // Merged free blocks in which a meeting of `minutes` fits, starting on the half hour.
@@ -253,7 +275,7 @@ export function ownerFreeWindows(profile, events, state, from, to, minutes, now)
   const blocks = [];
   let cur = null;
   for (let s = Math.ceil(Math.max(from, now) / step) * step; s + len <= to; s += step) {
-    if (isFree(profile, events, accepted, s, s + len)) {
+    if (isFree(profile, events, accepted, s, s + len, now, accepted)) {
       if (cur && s <= cur.end) cur.end = s + len;
       else { cur = { start: s, end: s + len }; blocks.push(cur); }
     }

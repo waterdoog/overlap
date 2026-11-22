@@ -1,3 +1,4 @@
+
 // The one write this page shares with other agent sites: a meeting request.
 // It runs in a window on THIS origin. The visitor types their own name and email here,
 // never in the other site's chat, and the request stays pending until the owner accepts.
@@ -5,6 +6,8 @@ import { Api } from "../js/api.js";
 import { assertionFrom, helloTo } from "../js/grant.js";
 
 if (typeof window !== "undefined" && window.opener) helloTo(window.opener);
+
+const $ = (s, root = document) => root.querySelector(s);
 
 export class RequestWindow {
   static CALLERS = ["*"];
@@ -140,10 +143,68 @@ export class RequestWindow {
       catch (e) { send.disabled = false; error.textContent = "The page's server could not be reached. Try again."; error.hidden = false; return; }
       if (!done.ok) { send.disabled = false; error.textContent = done.reason; error.hidden = false; return; }
       state.done = true;
+      if (done.cancel_token) {
+        try { localStorage.setItem(`overlap-cancel:${done.reference}`, done.cancel_token); } catch {}
+      }
+      const isAccepted = done.status === "accepted";
       const box = el("section", "", "panel confirmation");
-      box.append(el("h2", "Request sent"), el("p", `Reference ${done.reference}. ${done.message}`), el("p", state.container ? "The chat shows the reference too." : `This window closes now. The chat on ${state.caller} shows the reference too.`));
+      box.append(
+        el("h2", isAccepted ? "Meeting booked" : "Request sent"),
+        el("p", `Reference ${done.reference}. ${done.message}`),
+        el("p", state.container ? "The chat shows the reference too." : `This window closes now. The chat on ${state.caller} shows the reference too.`),
+      );
+      if (isAccepted) {
+        const calRow = el("div", "", "actions");
+        const icsLink = el("a", "Invite (.ics)", "small");
+        icsLink.href = Api.url(done.invite || `/api/invite.ics?ref=${done.reference}`);
+        const links = calendarAddLinks(done, state.args.title, p.name, details.from_name);
+        const gLink = el("a", "Google", "small");
+        gLink.href = links.google; gLink.target = "_blank"; gLink.rel = "noopener noreferrer";
+        const oLink = el("a", "Outlook", "small");
+        oLink.href = links.outlook; oLink.target = "_blank"; oLink.rel = "noopener noreferrer";
+        calRow.append(icsLink, gLink, oLink);
+        box.append(calRow);
+      }
+      if (done.cancel_token) {
+        const cancelRow = el("div", "", "actions");
+        const cancelReq = el("button", "Cancel this request", "secondary small-btn");
+        cancelReq.type = "button";
+        const cancelStatus = el("span", "", "small muted");
+        cancelReq.addEventListener("click", async () => {
+          cancelReq.disabled = true;
+          let token = done.cancel_token;
+          try { token = localStorage.getItem(`overlap-cancel:${done.reference}`) || token; } catch {}
+          const r = await Api.call("POST", "/api/cancel", { ref: done.reference, cancel_token: token }).catch(() => ({ ok: false, reason: "Could not reach server." }));
+          if (!r.ok) {
+            cancelReq.disabled = false;
+            cancelStatus.textContent = r.reason;
+            return;
+          }
+          cancelReq.hidden = true;
+          cancelStatus.textContent = "Cancelled.";
+          cancelStatus.className = "pill cancelled";
+        });
+        cancelRow.append(cancelReq, cancelStatus);
+        box.append(cancelRow);
+      }
       main.replaceChildren(head, box);
-      resolve({ ok: true, reference: done.reference, status: "pending", start: done.start, end: done.end, summary: `Request ${done.reference} sent to ${p.name} for ${when.theirs}. Pending until ${p.name} accepts.`, note: "The visitor typed their details in this person's window, which has now closed." });
+      const summaryMsg = isAccepted
+        ? `Meeting ${done.reference} booked with ${p.name} for ${when.theirs}.`
+        : `Request ${done.reference} sent to ${p.name} for ${when.theirs}. Pending until ${p.name} accepts.`;
+      resolve({
+        ok: true,
+        reference: done.reference,
+        status: done.status,
+        start: done.start,
+        end: done.end,
+        ...(isAccepted ? {
+          invite: done.invite || `/api/invite.ics?ref=${done.reference}`,
+          ...(done.google_calendar ? { google_calendar: done.google_calendar } : {}),
+          ...(done.outlook_calendar ? { outlook_calendar: done.outlook_calendar } : {}),
+        } : {}),
+        summary: summaryMsg,
+        note: "The visitor typed their details in this person's window, which has now closed.",
+      });
     });
     cancel.addEventListener("click", () => {
       if (state.done) return;
@@ -155,12 +216,26 @@ export class RequestWindow {
     });
     main.append(head, intro, summary, form);
     (state.container || document.body).append(main);
-    (state.from ? send : form.elements.from_name).focus();
+    ($("[name=from_name]", form) && (state.from ? send : form.elements.from_name)).focus();
   }
 
   static hostOf(origin) {
     try { return new URL(origin).host; } catch { return "another site"; }
   }
+}
+
+function icsTime(isoStr) { return new Date(isoStr).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); }
+
+function calendarAddLinks(done, title, ownerName, fromName) {
+  if (done.google_calendar && done.outlook_calendar) return { google: done.google_calendar, outlook: done.outlook_calendar };
+  const details = `Meeting between ${ownerName} and ${fromName}. Reference ${done.reference}.`;
+  const dates = `${icsTime(done.start)}/${icsTime(done.end)}`;
+  const startIso = new Date(done.start).toISOString();
+  const endIso = new Date(done.end).toISOString();
+  return {
+    google: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${encodeURIComponent(dates)}&details=${encodeURIComponent(details)}`,
+    outlook: `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&startdt=${encodeURIComponent(startIso)}&enddt=${encodeURIComponent(endIso)}&body=${encodeURIComponent(details)}`,
+  };
 }
 
 function el(tag, text, className = "") {
