@@ -83,6 +83,7 @@ export class AssistantMount {
       status.textContent = needsKey
         ? "Assistant needs your AI provider key. Add it in AI model settings below."
         : "Assistant connected to this page.";
+      status.classList.toggle("ready", !needsKey);
       if (!needsKey) {
         AssistantMount.greet();
       }

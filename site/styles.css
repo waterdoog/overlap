@@ -274,3 +274,5 @@ body > dialog h2 { margin: 0 0 12px; }
 #agent-app .ns-anode { background: var(--surface); }
 #agent-app [data-ns-slot="chat"] .ns-chat { border-radius: 10px; }
 @media (max-width: 900px) { #agent-app .ns-agents { border-left: 0; border-top: 1px solid var(--line); padding: 12px 0 0; } }
+#agent-app .ns-header { justify-content: flex-end; }
+.status-line.ready::before { background: var(--yes); }
