@@ -86,6 +86,12 @@ export class AssistantMount {
       if (!needsKey) {
         AssistantMount.greet();
       }
+      const input = document.querySelector("#ns-input");
+      if (input) {
+        input.placeholder = App.page.profile?.demo
+          ? "Try: Find 30 minutes next week with Bo and Cy"
+          : "Ask for a time, for example: 30 minutes next week";
+      }
       return booted.engine;
     } catch (error) {
       // The page must keep working without the assistant.
