@@ -175,3 +175,9 @@ export function busyIntervals(events, from, to) {
   }
   return out.sort((a, b) => a[0] - b[0]);
 }
+
+/** Busy intervals [[startMs, endMs], ...] as an iCalendar file with no titles or details. */
+export function busyToIcs(busy) {
+  const t = (ms) => new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", ...busy.flatMap(([s, e], i) => ["BEGIN:VEVENT", `UID:busy-${i}`, `DTSTART:${t(s)}`, `DTEND:${t(e)}`, "END:VEVENT"]), "END:VCALENDAR"].join("\r\n");
+}

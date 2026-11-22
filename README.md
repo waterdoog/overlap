@@ -138,6 +138,10 @@ a calendar file in your browser and sends only start and end times; titles, plac
 never leave your computer, and the owner panel can refresh them from a new file. **Stay in sync**:
 a private iCal address, which the server reads only to answer yes or no.
 
+Or **your own address**: the start page prepares your page's settings in your browser (busy times
+only) and gives you a "Deploy to Vercel" link that copies this repository into your own free account,
+so your page gets its own web origin and nothing passes through the hosted site.
+
 What the host keeps for each page: the profile, the busy times or the iCal address (never
 published), a hash of the owner key, a signing seed, receipts and requests.
 The owner can delete the page and all of it. Calendar addresses must be https and may not point at a

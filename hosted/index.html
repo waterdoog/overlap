@@ -27,6 +27,8 @@
     .days input { padding: 0; width: auto; }
     .help { font-size: 13px; color: var(--muted); }
     .done { border-left: 4px solid var(--yes); }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .small-btn { padding: 4px 10px; font-size: 13px; }
     .key { font-family: "JetBrains Mono", monospace; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; word-break: break-all; }
     @media (max-width: 700px) { .steps, .row { grid-template-columns: 1fr; } .start { padding: 20px 16px 40px; } }
   </style>
@@ -78,8 +80,20 @@
         <label>A line about you (optional) <input name="about" maxlength="300"></label>
         <label>Topics people can ask you about (optional, comma-separated) <input name="topics" maxlength="200"></label>
         <p id="err" class="field-error" role="alert" hidden></p>
-        <div><button type="submit">Create my page</button></div>
+        <div class="actions"><button type="submit">Create my page here</button><button type="button" id="own" class="secondary">Or: deploy it on my own address</button></div>
+        <p class="help">Here: ready in seconds, on this shared site. Your own address: your page gets its own web origin (the strongest isolation), on your own free Vercel account; this page prepares the settings in your browser and nothing is sent to this server.</p>
       </form>
+    </section>
+
+    <section class="card done" id="own-done" hidden>
+      <h2>Deploy your page on your own address</h2>
+      <p>1. Open <a id="deploy-link" href="#" target="_blank" rel="noopener">Deploy to Vercel</a> (it copies the open-source Overlap repository into your account).</p>
+      <p>2. When it asks for environment variables, paste these two. They were made in this browser; your busy times are inside, with no titles.</p>
+      <p><b>PASS_PROFILE</b> <button type="button" class="secondary small-btn" data-copy="#own-profile">Copy</button></p>
+      <p class="key" id="own-profile" style="max-height:8em;overflow:auto"></p>
+      <p><b>OWNER_KEY</b> (keep it: it signs you in as the owner) <button type="button" class="secondary small-btn" data-copy="#own-key">Copy</button></p>
+      <p class="key" id="own-key"></p>
+      <p>3. Optional, so receipts survive restarts: in the new project, Storage → Create → Blob (private), then redeploy.</p>
     </section>
 
     <section class="card done" id="done" hidden>
@@ -93,7 +107,9 @@
     <p class="help">Overlap pages are open agentic web sites: each has its own agent manifest, networks and answer rules. You can also run your own copy on your own domain; see the project's README.</p>
   </main>
   <script type="module">
-    import { parseIcs, busyIntervals } from "./u/assets/js/calendar.js";
+    import { parseIcs, busyIntervals, busyToIcs } from "./u/assets/js/calendar.js";
+    const REPO = "https://github.com/waterdoog/overlap";
+    const DAY_NAMES = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
     const form = document.querySelector("#create");
     for (const r of form.querySelectorAll("input[name=source]")) r.addEventListener("change", () => {
       const file = form.source.value === "file";
@@ -102,6 +118,35 @@
     form.timezone.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const days = [["mon", "Mon"], ["tue", "Tue"], ["wed", "Wed"], ["thu", "Thu"], ["fri", "Fri"], ["sat", "Sat"], ["sun", "Sun"]];
     document.querySelector("#days").innerHTML = days.map(([v, t], i) => `<label><input type="checkbox" name="days" value="${v}" ${i < 5 ? "checked" : ""}> ${t}</label>`).join("");
+    // Self-hosting: build the page's settings here; nothing goes to this server.
+    document.querySelector("#own").addEventListener("click", async () => {
+      const err = document.querySelector("#err"); err.hidden = true;
+      const fd = new FormData(form);
+      const name = (fd.get("name") || "").trim(), timezone = fd.get("timezone") || "UTC";
+      const f = form.ics_file.files[0];
+      if (!name) { err.textContent = "Enter your name."; err.hidden = false; return; }
+      if (!f) { err.textContent = "Pick a calendar file (.ics): your page's busy times come from it."; err.hidden = false; return; }
+      const now = Date.now();
+      const busy = busyIntervals(parseIcs(await f.text(), timezone), now, now + 120 * 864e5).filter(([, e]) => e > now).slice(0, 600);
+      const days = fd.getAll("days"); const from = fd.get("from"), to = fd.get("to");
+      const id = name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 24) || "me";
+      const profile = { id, name, timezone, headline: fd.get("headline") || "", org: fd.get("org") || "", about: fd.get("about") || "",
+        topics: String(fd.get("topics") || "").split(",").map((t) => t.trim()).filter(Boolean).slice(0, 6),
+        public_hours: `${days.map((d) => DAY_NAMES[d]).join(", ")} ${from}–${to} (${timezone})`,
+        working_hours: Object.fromEntries(days.map((d) => [d, [from, to]])), protected: [], buffer_minutes: 0, max_meetings_per_day: 8, answer_mode: "strict",
+        calendar: { ics: busyToIcs(busy) } };
+      const key = Array.from(crypto.getRandomValues(new Uint8Array(18)), (b) => b.toString(16).padStart(2, "0")).join("");
+      document.querySelector("#own-profile").textContent = JSON.stringify(profile);
+      document.querySelector("#own-key").textContent = key;
+      const q = new URLSearchParams({ "repository-url": REPO, "project-name": `overlap-${id}`, env: "PASS_PROFILE,OWNER_KEY",
+        envDescription: "PASS_PROFILE and OWNER_KEY were prepared on the Overlap start page", envLink: `${location.origin}/` });
+      document.querySelector("#deploy-link").href = `https://vercel.com/new/clone?${q}`;
+      document.querySelector("#create-card").hidden = true;
+      document.querySelector("#own-done").hidden = false;
+    });
+    for (const b of document.querySelectorAll("[data-copy]")) b.addEventListener("click", () => {
+      navigator.clipboard?.writeText(document.querySelector(b.dataset.copy).textContent).then(() => { b.textContent = "Copied"; }, () => {});
+    });
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const err = document.querySelector("#err");
@@ -125,7 +170,7 @@
       let r;
       try { r = await (await fetch("api/pages", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })).json(); }
       catch { r = { ok: false, reason: "The server could not be reached." }; }
-      btn.disabled = false; btn.textContent = "Create my page";
+      btn.disabled = false; btn.textContent = "Create my page here";
       if (!r.ok) { err.textContent = r.reason; err.hidden = false; return; }
       const path = new URL(r.page_url).pathname;
       try { localStorage.setItem(`overlap-owner-key:${path}`, r.owner_key); } catch {}

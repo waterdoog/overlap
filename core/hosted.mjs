@@ -11,7 +11,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { OwnerServer } from "./api.mjs";
-import { parseIcs } from "./calendar.mjs";
+import { parseIcs, busyToIcs } from "./calendar.mjs";
 
 const PALETTE = ["#2f6f5e", "#8a4b2a", "#4b3f8a", "#1f5f8a", "#7a2f55", "#5a6b1f"];
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
@@ -143,11 +143,7 @@ export function cleanBusy(raw, now) {
   return { list: list.sort((a, b) => a[0] - b[0]) };
 }
 
-// Busy intervals as an iCalendar file with no titles, for the policy's calendar reader.
-export function busyToIcs(busy) {
-  const t = (ms) => new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-  return ["BEGIN:VCALENDAR", "VERSION:2.0", ...busy.flatMap(([s, e], i) => ["BEGIN:VEVENT", `UID:busy-${i}`, `DTSTART:${t(s)}`, `DTEND:${t(e)}`, "END:VEVENT"]), "END:VCALENDAR"].join("\r\n");
-}
+export { busyToIcs };
 
 // Fetch a calendar by its private iCal address. Only https, and never a private network
 // address, so the server cannot be pointed at its own network.
