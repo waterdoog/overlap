@@ -8,7 +8,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="alternate" type="application/json" href="agent-manifest.json" title="Agent manifest">
 </head>
@@ -16,66 +16,80 @@
   <header class="topbar">
     <a class="wordmark" href="./"><span class="mark" aria-hidden="true"></span>Overlap</a>
     <nav>
-      <a href="agent-manifest.json" class="mono">agent-manifest.json</a>
-      <a href="overlap_pass.network.json" class="mono">overlap_pass</a>
       <button id="owner-toggle" class="link-button" type="button">Owner</button>
     </nav>
   </header>
 
   <div class="demo-bar" id="demo-bar" hidden>
-    <span><strong>Demo page.</strong> Three people, three origins. Try it as a visitor, or as the owner.</span>
-    <span class="demo-actions"><button type="button" id="demo-run" class="small-btn">Run the 30-second demo</button><button type="button" id="demo-owner" class="secondary small-btn">Sign in as <span class="who-first">owner</span></button><button type="button" id="demo-free" class="secondary small-btn" title="A real AI model on this site, free and limited per day. Or connect your own in AI model settings.">Free AI model</button><button type="button" id="demo-scripted" class="secondary small-btn" title="A scripted demo model on this site: no AI and no key, so you can watch the protocol.">Scripted (no AI)</button><span id="demo-links"></span><button type="button" id="demo-reset" class="secondary small-btn">Reset demo</button></span>
+    <div class="demo-inner">
+      <p class="demo-copy"><span class="demo-tag">Demo</span>Ana, Bo and Cy each run their own Overlap page, on three separate sites.</p>
+      <div class="demo-actions">
+        <button type="button" id="demo-run">Run the 30-second demo</button>
+        <button type="button" id="demo-owner" class="quiet">Sign in as <span class="who-first">owner</span></button>
+        <details class="demo-more">
+          <summary>More</summary>
+          <div class="demo-menu">
+            <span class="menu-label">Model for the assistant</span>
+            <button type="button" id="demo-free" class="menu-item" title="A real AI model on this site, free and limited per day.">Free AI model <span>real model, limited per day</span></button>
+            <button type="button" id="demo-scripted" class="menu-item" title="A scripted demo model: no AI and no key, so you can watch the protocol.">Scripted, no AI <span>watch the protocol step by step</span></button>
+            <span class="menu-label">The other pages</span>
+            <span id="demo-links" class="menu-links"></span>
+            <button type="button" id="demo-reset" class="menu-item">Reset the demo <span>clears requests and the log</span></button>
+          </div>
+        </details>
+      </div>
+    </div>
   </div>
+
   <main class="layout">
-    <section class="card profile" id="profile" aria-live="polite">
+    <section class="profile" id="profile" aria-live="polite">
       <div class="profile-row">
         <span class="avatar" id="p-avatar">··</span>
         <div>
           <h1 id="p-name">Loading…</h1>
-          <p class="muted" id="p-headline"></p>
+          <p class="headline" id="p-headline"></p>
         </div>
       </div>
-      <p id="p-about"></p>
-      <ul class="chips" id="p-topics"></ul>
+      <p class="about" id="p-about"></p>
+      <ul class="topics" id="p-topics" aria-label="Topics"></ul>
       <dl class="facts">
         <div><dt>Time zone</dt><dd id="p-tz"></dd></div>
         <div><dt>Usual hours</dt><dd id="p-hours"></dd></div>
-        <div><dt>Local time now</dt><dd id="p-now"></dd></div>
+        <div><dt>Local time</dt><dd id="p-now"></dd></div>
       </dl>
     </section>
 
-    <aside class="side">
-    <section class="card policy" aria-labelledby="policy-title">
-      <h2 id="policy-title">What this page tells agents</h2>
-      <ul class="rules">
-        <li><span class="yes">Yes</span> or <span class="no">no</span> for each exact time asked. Nothing else.</li>
-        <li id="r-mode"></li>
-        <li id="r-budget"></li>
-        <li>Never: events, titles, reasons, busy blocks, times not asked about.</li>
-        <li>Enforced by this page's server, not by a prompt.</li>
-      </ul>
-      <p class="small muted" id="usage-line"></p>
-    </section>
-
-    <section class="card manual" aria-labelledby="manual-title">
-      <h2 id="manual-title">Check a time yourself</h2>
-      <form id="manual-form" class="inline-form">
+    <section class="panel check" aria-labelledby="manual-title">
+      <h2 id="manual-title">Is <span class="who-first">this person</span> free?</h2>
+      <p class="answer-rule">This page answers <span class="yes">yes</span> or <span class="no">no</span> for the exact time you ask. Nothing else about the calendar leaves it.</p>
+      <form id="manual-form" class="check-form">
         <label>Date <input type="date" name="date" required></label>
         <label>Start <input type="time" name="time" step="900" required></label>
-        <label>Length <select name="minutes"><option>15</option><option selected>30</option><option>45</option><option>60</option></select></label>
+        <label>Length <select name="minutes"><option value="15">15 min</option><option value="30" selected>30 min</option><option value="45">45 min</option><option value="60">60 min</option></select></label>
         <button type="submit">Ask</button>
       </form>
-      <p class="muted small">Times are in your time zone (<span id="your-tz"></span>). Each question uses this site's daily budget.</p>
+      <p class="hint">In your time zone, <span id="your-tz"></span>.</p>
       <p id="manual-result" role="status"></p>
+      <details class="rules-more">
+        <summary>What other agents can learn here</summary>
+        <ul class="rules">
+          <li id="r-mode"></li>
+          <li id="r-budget"></li>
+          <li>Never events, titles, reasons, busy blocks or times nobody asked about.</li>
+          <li>Enforced by this page's server, not by a prompt.</li>
+        </ul>
+        <p class="hint" id="usage-line"></p>
+      </details>
     </section>
-    </aside>
 
-    <section class="card assistant" aria-labelledby="assistant-title">
+    <section class="panel assistant" aria-labelledby="assistant-title">
       <div class="section-head">
-        <h2 id="assistant-title">Ask <span class="who-first">this page</span>'s agent</h2>
-        <p class="muted" id="assistant-status" role="status">Loading the assistant…</p>
+        <div>
+          <h2 id="assistant-title"><span class="who-first">This page</span>'s assistant</h2>
+          <p class="assistant-note">Finds a time with other people's pages. It runs in your browser on the model you pick, and asks you before it contacts anyone.</p>
+        </div>
+        <p class="status-line" id="assistant-status" role="status">Loading the assistant…</p>
       </div>
-      <p class="assistant-note small muted">Your messages go to the AI provider you choose in the settings below, on your own key. Before the assistant contacts another person's page, you approve it on a card.</p>
       <div id="agent-app">
         <div data-ns-slot="header"></div>
         <div class="assistant-panels">
@@ -89,9 +103,9 @@
 
 
     <section class="owner" id="owner" hidden>
-      <div class="card people" aria-labelledby="people-title">
+      <div class="panel people" aria-labelledby="people-title">
         <h2 id="people-title">People</h2>
-        <p class="muted small">Paste someone's Overlap page. Your assistant asks their page yes-or-no questions; you approve each contact on a card.</p>
+        <p class="hint">Paste someone's Overlap page. Your assistant asks it only yes-or-no questions, and you approve each contact.</p>
         <ul id="people-list" class="people-list"></ul>
         <form id="people-form" class="inline-form">
           <input type="url" name="url" placeholder="https://their-page.example/" required aria-label="Their Overlap page address">
@@ -100,14 +114,14 @@
         <p id="people-msg" class="field-error" role="alert" hidden></p>
       </div>
 
-      <div class="card inbox" aria-labelledby="inbox-title">
+      <div class="panel inbox" aria-labelledby="inbox-title">
         <h2 id="inbox-title">Requests to you</h2>
         <ul id="request-list" class="request-list"></ul>
         <p class="small" id="busy-row" hidden>Update busy times from a calendar file (only start and end times leave this browser): <input type="file" id="busy-file" accept=".ics,text/calendar"> <span id="busy-msg" class="muted"></span></p>
         <p class="small muted" id="feed-line">Accepted meetings appear in your calendar app when you subscribe to <a id="feed-link" href="#">your Overlap calendar</a> (an .ics feed only you have the address of).</p>
       </div>
 
-      <div class="card receipts" aria-labelledby="receipts-title">
+      <div class="panel receipts" aria-labelledby="receipts-title">
         <div class="section-head">
           <h2 id="receipts-title">Who asked what</h2>
           <div class="meter" id="budget-meter"></div>
@@ -119,7 +133,7 @@
             <button type="button" role="radio" data-mode="helpful">Helpful: + up to 2 nearby free times</button>
           </div>
         </div>
-        <h3 class="sub">Pages that proved who they are</h3>
+        <h3 class="sub">Signed pages</h3>
         <ul id="grant-list" class="grant-list"></ul>
         <table class="receipt-table">
           <thead><tr><th>When</th><th>Site</th><th>Asked</th><th>Answered</th></tr></thead>
@@ -146,7 +160,8 @@
   </dialog>
 
   <footer class="foot">
-    <p>An <a href="https://github.com/cognizant-ai-labs/agentic-web">open agentic web</a> page. Agents run in your browser on your own AI key. This page's agent files are public; the calendar is not.</p>
+    <p>An <a href="https://github.com/cognizant-ai-labs/agentic-web">open agentic web</a> page. Its agent files are public; the calendar is not.</p>
+    <p class="foot-links">For agents: <a href="agent-manifest.json">agent-manifest.json</a> · <a href="overlap_pass.network.json">overlap_pass network</a> · <a href="https://github.com/waterdoog/overlap">Source</a></p>
   </footer>
 
   <script type="module" src="page-ui.js"></script>

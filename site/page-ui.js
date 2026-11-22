@@ -24,9 +24,9 @@ function renderProfile() {
   tick(); setInterval(tick, 30000);
   for (const n of document.querySelectorAll(".who-first")) n.textContent = p.name.split(" ")[0];
   $("#r-mode").textContent = p.answer_mode === "helpful"
-    ? "Helpful mode: when no asked time is free, it may offer up to two nearby free times."
-    : "Strict mode: no suggestions, only the answer to the question asked.";
-  $("#r-budget").textContent = `At most ${p.rules.max_windows_per_question} times per question. A page that proves who it is (a signed assertion from its owner) gets ${p.rules.per_page_per_day} a day; everyone else shares ${p.rules.unverified_total_per_day} a day. However many askers, at most ${p.rules.per_week_total} answers about any one week.`;
+    ? "If none of the asked times is free, it may suggest up to two nearby free times."
+    : "No suggestions: only the answer to the question asked.";
+  $("#r-budget").textContent = `Up to ${p.rules.max_windows_per_question} times per question. A page that proves who it is gets ${p.rules.per_page_per_day} answers a day; everyone else shares ${p.rules.unverified_total_per_day}. At most ${p.rules.per_week_total} answers about any one week, however many ask.`;
   $("#your-tz").textContent = myTz;
 }
 
@@ -57,7 +57,7 @@ function manualForm() {
 function renderOwner() {
   const box = $("#owner");
   box.hidden = !page.owner;
-  $("#owner-toggle").textContent = page.owner ? `Owner ✓` : "Owner";
+  $("#owner-toggle").textContent = page.owner ? "Signed in as owner" : "Owner sign-in";
   if (!page.owner) return;
   // People
   $("#people-list").replaceChildren(...page.people.map((x) => {
@@ -204,7 +204,8 @@ async function usageLine() {
   const s = await Api.call("GET", "/api/stats").catch(() => null);
   if (!s?.ok) return;
   const w = s.last_7_days || {};
-  $("#usage-line").textContent = `Last 7 days (anonymous counts): ${w.check || 0} availability questions answered, ${w.request || 0} meeting requests, ${w.demo || 0} demo runs.`;
+  const n = (x, word) => `${x || 0} ${word}${(x || 0) === 1 ? "" : "s"}`;
+  $("#usage-line").textContent = `Last 7 days, counted anonymously: ${n(w.check, "question")} answered, ${n(w.request, "meeting request")}, ${n(w.demo, "demo run")}.`;
 }
 
 function demoBar() {

@@ -1,0 +1,222 @@
+{
+ "bo": {
+  "ok": true,
+  "profile": {
+   "name": "Bo Okafor",
+   "timezone": "Europe/London",
+   "answer_mode": "strict"
+  },
+  "budget": {
+   "per_page_per_day": 18,
+   "total_per_day": 84,
+   "pages_total_per_day": 60,
+   "pages_used_today": 7,
+   "unverified_total_per_day": 24,
+   "unverified_used_today": 0,
+   "used_today": 7,
+   "by_site": {
+    "http://localhost:9200/u/ana-lindqvist-90b6": 7
+   }
+  },
+  "receipts": [
+   {
+    "kind": "request",
+    "at": 1795330205076,
+    "caller": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "page": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "verified": true,
+    "ip": "6f65205fab41",
+    "purpose": "Pricing sync",
+    "asked": [
+     {
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
+     }
+    ],
+    "answers": [
+     true
+    ],
+    "suggestions": [],
+    "cost": 1,
+    "refused": false
+   },
+   {
+    "kind": "check",
+    "at": 1795330134719,
+    "caller": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "page": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "verified": true,
+    "trusted": false,
+    "ip": "6f65205fab41",
+    "purpose": "pricing sync",
+    "asked": [
+     {
+      "start": "2026-11-23T15:00:00.000Z",
+      "end": "2026-11-23T15:30:00.000Z"
+     },
+     {
+      "start": "2026-11-23T15:30:00.000Z",
+      "end": "2026-11-23T16:00:00.000Z"
+     },
+     {
+      "start": "2026-11-25T14:00:00.000Z",
+      "end": "2026-11-25T14:30:00.000Z"
+     },
+     {
+      "start": "2026-11-25T15:30:00.000Z",
+      "end": "2026-11-25T16:00:00.000Z"
+     },
+     {
+      "start": "2026-11-26T14:00:00.000Z",
+      "end": "2026-11-26T14:30:00.000Z"
+     },
+     {
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
+     }
+    ],
+    "answers": [
+     true,
+     true,
+     true,
+     false,
+     false,
+     true
+    ],
+    "suggestions": [],
+    "cost": 6,
+    "refused": false
+   }
+  ],
+  "requests": [
+   {
+    "ref": "OV-EB8BA9",
+    "status": "pending",
+    "created": 1795330205076,
+    "caller": "http://localhost:9200",
+    "start": "2026-11-26T14:30:00.000Z",
+    "end": "2026-11-26T15:00:00.000Z",
+    "title": "Pricing sync",
+    "from_name": "Ana Lindqvist",
+    "from_email": "ana@northwind.example",
+    "from_page": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "note": "Agenda: Q1 pricing"
+   }
+  ],
+  "calendar_feed": "/api/calendar.ics?token=0d4382dc2a93217e747fbdf4840a66ea",
+  "grants": {},
+  "pages": [
+   "http://localhost:9200/u/ana-lindqvist-90b6"
+  ]
+ },
+ "cy": {
+  "ok": true,
+  "profile": {
+   "name": "Cy Tanaka",
+   "timezone": "America/Toronto",
+   "answer_mode": "strict"
+  },
+  "budget": {
+   "per_page_per_day": 18,
+   "total_per_day": 84,
+   "pages_total_per_day": 60,
+   "pages_used_today": 7,
+   "unverified_total_per_day": 24,
+   "unverified_used_today": 0,
+   "used_today": 7,
+   "by_site": {
+    "http://localhost:9200/u/ana-lindqvist-90b6": 7
+   }
+  },
+  "receipts": [
+   {
+    "kind": "request",
+    "at": 1795330207870,
+    "caller": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "page": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "verified": true,
+    "ip": "6f65205fab41",
+    "purpose": "Pricing sync",
+    "asked": [
+     {
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
+     }
+    ],
+    "answers": [
+     true
+    ],
+    "suggestions": [],
+    "cost": 1,
+    "refused": false
+   },
+   {
+    "kind": "check",
+    "at": 1795330139529,
+    "caller": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "page": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "verified": true,
+    "trusted": false,
+    "ip": "6f65205fab41",
+    "purpose": "pricing sync",
+    "asked": [
+     {
+      "start": "2026-11-23T15:00:00.000Z",
+      "end": "2026-11-23T15:30:00.000Z"
+     },
+     {
+      "start": "2026-11-23T15:30:00.000Z",
+      "end": "2026-11-23T16:00:00.000Z"
+     },
+     {
+      "start": "2026-11-25T14:00:00.000Z",
+      "end": "2026-11-25T14:30:00.000Z"
+     },
+     {
+      "start": "2026-11-25T15:30:00.000Z",
+      "end": "2026-11-25T16:00:00.000Z"
+     },
+     {
+      "start": "2026-11-26T14:00:00.000Z",
+      "end": "2026-11-26T14:30:00.000Z"
+     },
+     {
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
+     }
+    ],
+    "answers": [
+     false,
+     false,
+     false,
+     false,
+     false,
+     true
+    ],
+    "suggestions": [],
+    "cost": 6,
+    "refused": false
+   }
+  ],
+  "requests": [
+   {
+    "ref": "OV-6567D8",
+    "status": "pending",
+    "created": 1795330207870,
+    "caller": "http://localhost:9200",
+    "start": "2026-11-26T14:30:00.000Z",
+    "end": "2026-11-26T15:00:00.000Z",
+    "title": "Pricing sync",
+    "from_name": "Ana Lindqvist",
+    "from_email": "ana@northwind.example",
+    "from_page": "http://localhost:9200/u/ana-lindqvist-90b6",
+    "note": "Agenda: Q1 pricing"
+   }
+  ],
+  "calendar_feed": "/api/calendar.ics?token=20d9ad93054da4fa7f081a7078c2cd71",
+  "grants": {},
+  "pages": [
+   "http://localhost:9200/u/ana-lindqvist-90b6"
+  ]
+ }
+}

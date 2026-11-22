@@ -8,46 +8,90 @@
   <link rel="icon" href="u/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="u/assets/styles.css">
   <style>
-    .start { max-width: 760px; margin: 0 auto; padding: 32px 24px 60px; display: grid; gap: 18px; }
-    .start h1 { font-size: 38px; }
-    .lede { font-size: 17px; color: var(--muted); margin: 6px 0 0; }
-    .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .steps .card { padding: 14px; font-size: 14px; }
-    .steps b { display: block; font: 600 15px Fraunces, serif; margin-bottom: 4px; }
-    form.create { display: grid; gap: 12px; }
-    form.create label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
-    form.create label.choice { display: flex; gap: 8px; align-items: flex-start; color: var(--ink); font-size: 14px; margin: 6px 0; }
-    form.create label.choice input { width: auto; margin-top: 3px; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .days { display: flex; flex-wrap: wrap; gap: 8px; }
-    form.create .days label { display: inline-flex; gap: 6px; align-items: center; color: var(--ink); font-size: 14px; }
-    .days input { padding: 0; width: auto; }
-    .help { font-size: 13px; color: var(--muted); }
-    .done { border-left: 4px solid var(--yes); }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .start { max-width: 1040px; margin: 0 auto; padding: 56px 28px 64px; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 56px; align-items: center; }
+    .hero h1 { font-size: 44px; line-height: 1.08; letter-spacing: -0.03em; }
+    .lede { font-size: 18px; line-height: 1.55; color: var(--ink-2); margin: 18px 0 0; max-width: 32em; text-wrap: pretty; }
+    .hero-cta { display: flex; gap: 18px; align-items: center; margin-top: 28px; flex-wrap: wrap; }
+    .hero-cta .button { display: inline-block; text-decoration: none; background: var(--navy); color: #fff; padding: 11px 18px; border-radius: 8px; font-weight: 600; }
+    .hero-cta .button:hover { background: var(--navy-hover); }
+    .hero-cta a:not(.button) { font-weight: 500; }
+    .exchange { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; font-size: 14px; }
+    .exchange .who { display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 14px; }
+    .exchange .who .avatar { background: #8a4b2a; }
+    .exchange ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .exchange li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 12px; border-radius: 8px; background: var(--sunken); color: var(--ink-2); }
+    .exchange li b { font-weight: 600; }
+    .exchange li.y b { color: var(--yes); } .exchange li.n b { color: var(--no); }
+    .exchange .foot-note { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .create-wrap { margin-top: 72px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; align-items: start; }
+    .create-wrap aside h2 { font-size: 22px; letter-spacing: -0.015em; }
+    .create-wrap aside p { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
+    form.create { display: grid; gap: 18px; }
+    form.create label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+    form.create label.choice { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: 14px; color: var(--ink-2); padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 8px; cursor: pointer; }
+    form.create label.choice:has(input:checked) { border-color: var(--navy); background: #f5f7fb; }
+    form.create label.choice b { color: var(--ink); }
+    form.create label.choice input { width: auto; height: auto; margin-top: 3px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .group { display: grid; gap: 10px; padding-top: 18px; border-top: 1px solid var(--line); }
+    fieldset.group > legend { float: left; width: 100%; }
+    fieldset.group > legend + * { clear: both; }
+    .group legend, .group > .group-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; padding: 0; }
+    .days { display: flex; flex-wrap: wrap; gap: 6px; }
+    form.create .days label { display: inline-flex; gap: 6px; align-items: center; font-weight: 500; font-size: 14px; color: var(--ink); border: 1px solid var(--line-strong); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+    form.create .days label:has(input:checked) { border-color: var(--navy); background: #f5f7fb; }
+    .days input { padding: 0; width: auto; height: auto; }
+    .help { font-size: 13px; color: var(--muted); margin: 0; }
+    details.help summary { cursor: pointer; color: var(--ink-2); font-weight: 500; }
+    details.help p { margin: 8px 0 0; }
+    .done { border: 1px solid var(--yes); }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .actions button[type=submit] { padding: 11px 18px; font-weight: 600; }
     .small-btn { padding: 4px 10px; font-size: 13px; }
-    .key { font-family: "JetBrains Mono", monospace; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; word-break: break-all; }
-    @media (max-width: 700px) { .steps, .row { grid-template-columns: 1fr; } .start { padding: 20px 16px 40px; } }
+    .key { font-family: "JetBrains Mono", monospace; font-size: 13px; background: var(--sunken); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; word-break: break-all; }
+    .result-wrap { margin-top: 24px; display: grid; gap: 16px; }
+    .page-foot { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); }
+    @media (max-width: 860px) {
+      .start { padding: 32px 16px 48px; }
+      .hero, .create-wrap { grid-template-columns: 1fr; gap: 28px; }
+      .hero h1 { font-size: 34px; }
+      .lede { font-size: 16.5px; }
+      .create-wrap { margin-top: 48px; }
+      .row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <header class="topbar"><a class="wordmark" href="./"><span class="mark" aria-hidden="true"></span>Overlap</a></header>
   <main class="start">
-    <section>
-      <h1>Your calendar answers for you. Only yes or no.</h1>
-      <p class="lede">Make an agentic page in a minute. Other people's assistants can ask it whether you are free at exact times and send you meeting requests. Nobody sees your calendar.</p>
+    <section class="hero">
+      <div>
+        <h1>Your calendar answers for you. Only yes or no.</h1>
+        <p class="lede">Get a page that other people's AI assistants can ask: “Is Ana free at 15:30 on Thursday?” It says yes or no, keeps a log of every question, and never shows the calendar itself.</p>
+        <p class="hero-cta"><a class="button" href="#create-card">Get your page</a><a href="https://overlap-ana.vercel.app/">See a demo page</a></p>
+      </div>
+      <div class="exchange" aria-label="Example of what another assistant sees">
+        <div class="who"><span class="avatar small">BO</span>Bo's assistant asks Ana's page</div>
+        <ol>
+          <li class="n"><span>Mon 23 Nov, 16:00–16:30</span><b>no</b></li>
+          <li class="n"><span>Wed 25 Nov, 15:00–15:30</span><b>no</b></li>
+          <li class="y"><span>Thu 26 Nov, 15:30–16:00</span><b>yes</b></li>
+        </ol>
+        <p class="foot-note">That is all it learns, and every question lands in Ana's log.</p>
+      </div>
     </section>
-    <div class="steps">
-      <div class="card"><b>1. Paste your calendar</b>Its private iCal address. This server reads it only to answer yes or no.</div>
-      <div class="card"><b>2. Share your page</b>People, or their assistants, ask your page. Each question is logged for you.</div>
-      <div class="card"><b>3. Find times together</b>Add other people's pages, and your assistant asks them all for you.</div>
-    </div>
 
-    <section class="card" id="create-card">
+    <div class="create-wrap">
+    <aside>
       <h2>Get your page</h2>
+      <p>Takes a minute. You can delete the page, and everything stored with it, at any time.</p>
+    </aside>
+    <div>
+    <section id="create-card">
       <form class="create" id="create">
         <div class="row">
           <label>Your name <input name="name" required maxlength="60" autocomplete="name"></label>
@@ -57,18 +101,19 @@
           <label>Organisation (optional) <input name="org" maxlength="80"></label>
           <label>Time zone <input name="timezone" required></label>
         </div>
-        <fieldset>
-          <legend class="help">Usual working days and hours (shown on your page, so assistants ask sensible times)</legend>
+        <fieldset class="group">
+          <legend>Working days and hours</legend>
+          <p class="help">Shown on your page, so assistants ask about sensible times.</p>
           <div class="days" id="days"></div>
           <div class="row" style="margin-top:8px">
             <label>From <input name="from" type="time" value="09:00" required></label>
             <label>To <input name="to" type="time" value="17:00" required></label>
           </div>
         </fieldset>
-        <fieldset>
-          <legend class="help">How should your page know when you are busy?</legend>
-          <label class="choice"><input type="radio" name="source" value="file" checked> <span><b>Busy times only</b> (recommended): pick a calendar file (.ics). Your browser reads it and sends only start and end times; titles, places, people and notes never leave this computer. Re-upload when your week changes.</span></label>
-          <label class="choice"><input type="radio" name="source" value="url"> <span><b>Stay in sync</b>: your calendar's private iCal address. This server then reads your events (only to answer yes or no; never shown or shared).</span></label>
+        <fieldset class="group">
+          <legend>When you are busy</legend>
+          <label class="choice"><input type="radio" name="source" value="file" checked> <span><b>Busy times only</b> · recommended<br>Pick a calendar file. Your browser sends only start and end times; titles, places and people stay on this computer.</span></label>
+          <label class="choice"><input type="radio" name="source" value="url"> <span><b>Stay in sync</b><br>Paste your calendar's private iCal address. This server reads it only to answer yes or no.</span></label>
         </fieldset>
         <label id="file-row">Calendar file (.ics)
           <input name="ics_file" type="file" accept=".ics,text/calendar">
@@ -76,16 +121,20 @@
         <label id="url-row" hidden>Your calendar's private iCal address
           <input name="ics_url" type="url" placeholder="https://calendar.google.com/calendar/ical/…/private-…/basic.ics">
         </label>
-        <p class="help">Get a file: Google Calendar → Settings → Import &amp; export → Export; Outlook → Calendar → Save calendar (or Publish a calendar as ICS, "Can view when I'm busy" for busy times only). Get an address: Google Calendar → your calendar → Integrate calendar → <i>Secret address in iCal format</i>. You can delete your page, and everything stored with it, at any time.</p>
-        <label>A line about you (optional) <input name="about" maxlength="300"></label>
-        <label>Topics people can ask you about (optional, comma-separated) <input name="topics" maxlength="200"></label>
+        <details class="help"><summary>Where do I find these?</summary><p>File: Google Calendar → Settings → Import &amp; export → Export. Outlook → Calendar → Save calendar, or Publish a calendar as ICS with “Can view when I'm busy”.</p><p>Address: Google Calendar → your calendar → Integrate calendar → <i>Secret address in iCal format</i>.</p></details>
+        <div class="group">
+          <span class="group-title">About you (optional)</span>
+          <label>One line <input name="about" maxlength="300" placeholder="I run product at Northwind Labs. Happy to talk about pricing."></label>
+          <label>Topics, comma-separated <input name="topics" maxlength="200" placeholder="pricing, onboarding, hiring"></label>
+        </div>
         <p id="err" class="field-error" role="alert" hidden></p>
-        <div class="actions"><button type="submit">Create my page here</button><button type="button" id="own" class="secondary">Or: deploy it on my own address</button></div>
-        <p class="help">Here: ready in seconds, on this shared site. Your own address: your page gets its own web origin (the strongest isolation), on your own free Vercel account; this page prepares the settings in your browser and nothing is sent to this server.</p>
+        <div class="actions"><button type="submit">Create my page</button><button type="button" id="own" class="secondary">Deploy on my own address instead</button></div>
+        <p class="help">Your own address gives the page its own web origin, on your free Vercel account. The settings are prepared in this browser; nothing is sent here.</p>
       </form>
     </section>
+    <div class="result-wrap">
 
-    <section class="card done" id="own-done" hidden>
+    <section class="panel done" id="own-done" hidden>
       <h2>Deploy your page on your own address</h2>
       <p>1. Open <a id="deploy-link" href="#" target="_blank" rel="noopener">Deploy to Vercel</a> (it copies the open-source Overlap repository into your account).</p>
       <p>2. When it asks for environment variables, paste these two. They were made in this browser; your busy times are inside, with no titles.</p>
@@ -96,7 +145,7 @@
       <p>3. Optional, so receipts survive restarts: in the new project, Storage → Create → Blob (private), then redeploy.</p>
     </section>
 
-    <section class="card done" id="done" hidden>
+    <section class="panel done" id="done" hidden>
       <h2>Your page is ready</h2>
       <p>Your page: <a id="page-link" href="#"></a></p>
       <p>Your owner key, shown once. It signs you in as the owner of your page (this browser is already signed in). Keep it somewhere safe:</p>
@@ -104,7 +153,10 @@
       <p><button type="button" id="open">Open my page</button></p>
     </section>
 
-    <p class="help">Overlap pages are open agentic web sites: each has its own agent manifest, networks and answer rules. You can also run your own copy on your own domain; see the project's README.</p>
+    </div>
+    </div>
+    </div>
+    <p class="help page-foot">Every Overlap page is an <a href="https://github.com/cognizant-ai-labs/agentic-web">open agentic web</a> site with its own agent manifest and answer rules. <a href="https://github.com/waterdoog/overlap">Source</a></p>
   </main>
   <script type="module">
     import { parseIcs, busyIntervals, busyToIcs } from "./u/assets/js/calendar.js";

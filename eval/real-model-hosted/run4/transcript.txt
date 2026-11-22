@@ -1,0 +1,73 @@
+OWNER: Find 30 minutes next week with Bo and Cy for a pricing sync.
+
+[clicked] Allow | 🔗 Contact Bo Okafor's page on your behalf?
+localhost:9200/u/bo-okafor-ca96
+Allow
+Always allow
+Decline
+
+[clicked] Allow | 🔗 Contact Cy Tanaka's page on your behalf?
+localhost:9200/u/cy-tanaka-4227
+Allow
+Always allow
+Decline
+
+ASSISTANT: I checked availability with Bo Okafor (Overlap page) and Cy Tanaka (Overlap page) for a 30-minute pricing sync next week (all times in Europe/Stockholm):
+
+Time (Europe/Stockholm)	Bo Okafor	Cy Tanaka
+Mon 23 Nov, 16:00–16:30	free	not free
+Mon 23 Nov, 16:30–17:00	free	not free
+Wed 25 Nov, 15:00–15:30	free	not free
+Wed 25 Nov, 16:30–17:00	not free	not free
+Thu 26 Nov, 15:00–15:30	not free	not free
+Thu 26 Nov, 15:30–16:00	free	free
+
+Works for everyone:
+
+Thu 26 Nov, 15:30–16:00 Europe/Stockholm (14:30–15:00 UTC / 14:30 Europe/London / 09:30 America/Toronto)
+
+Would you like me to send meeting requests to Bo and Cy for Thu 26 Nov, 15:30–16:00 (titled Pricing sync), or check additional times?
+
+OWNER: Send both of them a request for the time that works for everyone, titled Pricing sync.
+
+[clicked] Allow | 🔗 Contact Bo Okafor's page on your behalf?
+localhost:9200/u/bo-okafor-ca96
+Allow
+Always allow
+Decline
+
+[clicked] Allow | 🔗 Contact Cy Tanaka's page on your behalf?
+localhost:9200/u/cy-tanaka-4227
+Allow
+Always allow
+Decline
+
+[clicked] Open Overlap
+
+[window] localhost:9200 | From
+Ana Lindqvist, Northwind Labs, Stockholm (signed by their Overlap page, localhost:9200/u/ana-lindqvist-de0e)
+What
+Pricing sync
+Bo's time
+Thursday 26 November at 14:30–15:00 (Europe/London)
+Your time
+Thursday 26 November at 09:30–10:00 (America/New_York)
+
+[clicked] Open Overlap
+
+[window] localhost:9200 | From
+Ana Lindqvist, Northwind Labs, Stockholm (signed by their Overlap page, localhost:9200/u/ana-lindqvist-de0e)
+What
+Pricing sync
+Cy's time
+Thursday 26 November at 09:30–10:00 (America/Toronto)
+Your time
+Thursday 26 November at 09:30–10:00 (America/New_York)
+
+ASSISTANT: Both meeting requests for Pricing sync on Thu 26 Nov 2026, 15:30–16:00 Europe/Stockholm (14:30–15:00 UTC) have been sent:
+
+Person	Site	Local Time	Reference	Status
+Bo Okafor	Bo Okafor's Overlap page	14:30–15:00 Europe/London	OV-CB1FDD	Pending
+Cy Tanaka	Cy Tanaka's Overlap page	09:30–10:00 America/Toronto	OV-27353F	Pending
+
+Both requests stay pending until each person accepts. Once a person accepts, their Overlap page offers a standard calendar invite (.ics) for that reference. Let me know whenever you'd like me to check the status of either request.

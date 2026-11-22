@@ -404,5 +404,26 @@ export class AssistantMount {
 // Boot only in a browser. Node tests import this file to check the dialog's words.
 if (typeof window !== "undefined") {
   await App.page.ready;
+  await freeModelByDefault();
   await AssistantMount.start();
+}
+
+/**
+ * On a demo page, a visitor with no model settings starts on this site's free model, the
+ * same setup the demo bar's "Free AI model" button applies, only for this tab and without
+ * a reload. Saved settings, or a setup already applied in this tab, always win.
+ */
+async function freeModelByDefault() {
+  if (!App.page.profile?.demo) return;
+  try {
+    if (localStorage.getItem("nsweb-byok-profiles-v1") || sessionStorage.getItem("nsweb-byok-router") !== null) return;
+    const models = await fetch("llm/v1/models").then((r) => (r.ok ? r.json() : null));
+    const id = models?.data?.[0]?.id;
+    if (!id) return;
+    sessionStorage.setItem("nsweb-byok-tab-key", "free-demo");
+    sessionStorage.setItem("nsweb-byok-model", id);
+    sessionStorage.setItem("nsweb-byok-router", `${location.origin}/llm/v1`);
+  } catch {
+    // No storage or no free model: the visitor connects one in AI model settings.
+  }
 }
