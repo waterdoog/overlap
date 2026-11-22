@@ -81,16 +81,16 @@ function ensureExtraSettingsControls() {
   const autoCb = document.createElement("input");
   autoCb.type = "checkbox";
   autoCb.id = "set-auto-accept";
-  autoWrap.append(autoCb, document.createTextNode(" Auto-accept trusted pages"));
+  autoWrap.append(autoCb, document.createTextNode(" Instantly accept trusted pages"));
 
   const holdWrap = el("label", "", "small");
   const holdCb = document.createElement("input");
   holdCb.type = "checkbox";
   holdCb.id = "set-hold-pending";
-  holdWrap.append(holdCb, document.createTextNode(" Hold pending slots"));
+  holdWrap.append(holdCb, document.createTextNode(" Hold times with pending requests"));
 
   const noticeWrap = el("label", "", "small");
-  noticeWrap.append(document.createTextNode("Min notice (h) "));
+  noticeWrap.append(document.createTextNode("Minimum notice, hours "));
   const noticeIn = document.createElement("input");
   Object.assign(noticeIn, { type: "number", id: "set-min-notice", min: "0", max: "168", step: "1" });
   noticeIn.style.width = "4.5em";
@@ -113,7 +113,7 @@ function ensureExtraSettingsControls() {
     page.refreshOwner();
   });
 
-  wrap.append(autoWrap, document.createTextNode(" · "), holdWrap, document.createTextNode(" · "), noticeWrap);
+  wrap.append(autoWrap, holdWrap, noticeWrap);
   seg.insertAdjacentElement("afterend", wrap);
 }
 

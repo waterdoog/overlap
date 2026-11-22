@@ -280,3 +280,7 @@ body > dialog h2 { margin: 0 0 12px; }
 .status-line.ready::before { background: var(--yes); }
 .grant .mono, .grant span { font-family: inherit; font-size: 14px; }
 .grant select { height: 34px; font-size: 13.5px; width: auto; }
+.owner-settings { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; flex-basis: 100%; margin-top: 4px; }
+.owner-settings label { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; color: var(--ink-2); font-size: 14px; }
+.owner-settings input[type="checkbox"] { width: 16px; height: 16px; margin: 0; }
+.owner-settings input[type="number"] { height: 32px; padding: 0 8px; font-size: 14px; }

@@ -4,7 +4,10 @@
   "profile": {
    "name": "Bo Okafor",
    "timezone": "Europe/London",
-   "answer_mode": "strict"
+   "answer_mode": "strict",
+   "auto_accept_trusted": false,
+   "min_notice_hours": 0,
+   "hold_pending": true
   },
   "budget": {
    "per_page_per_day": 18,
@@ -21,10 +24,11 @@
   "receipts": [
    {
     "kind": "request",
-    "at": 1795332493901,
+    "at": 1795367357716,
     "caller": "https://overlap-ana.vercel.app",
     "page": "https://overlap-ana.vercel.app",
     "verified": true,
+    "trusted": false,
     "ip": "768c4e62be82",
     "purpose": "Pricing sync",
     "asked": [
@@ -42,7 +46,7 @@
    },
    {
     "kind": "check",
-    "at": 1795332486298,
+    "at": 1795367349949,
     "caller": "https://overlap-ana.vercel.app",
     "page": "https://overlap-ana.vercel.app",
     "verified": true,
@@ -90,10 +94,11 @@
   ],
   "requests": [
    {
-    "ref": "OV-D102FD",
+    "ref": "OV-4F2F1B",
     "status": "pending",
-    "created": 1795332493901,
+    "created": 1795367357716,
     "caller": "https://overlap-ana.vercel.app",
+    "verified": true,
     "start": "2026-11-26T14:30:00.000Z",
     "end": "2026-11-26T15:00:00.000Z",
     "title": "Pricing sync",
@@ -114,7 +119,10 @@
   "profile": {
    "name": "Cy Tanaka",
    "timezone": "America/Toronto",
-   "answer_mode": "strict"
+   "answer_mode": "strict",
+   "auto_accept_trusted": false,
+   "min_notice_hours": 0,
+   "hold_pending": true
   },
   "budget": {
    "per_page_per_day": 18,
@@ -131,10 +139,11 @@
   "receipts": [
    {
     "kind": "request",
-    "at": 1795332498045,
+    "at": 1795367361728,
     "caller": "https://overlap-ana.vercel.app",
     "page": "https://overlap-ana.vercel.app",
     "verified": true,
+    "trusted": false,
     "ip": "768c4e62be82",
     "purpose": "Pricing sync",
     "asked": [
@@ -152,7 +161,7 @@
    },
    {
     "kind": "check",
-    "at": 1795332488595,
+    "at": 1795367352331,
     "caller": "https://overlap-ana.vercel.app",
     "page": "https://overlap-ana.vercel.app",
     "verified": true,
@@ -200,10 +209,11 @@
   ],
   "requests": [
    {
-    "ref": "OV-7E73AC",
+    "ref": "OV-2693B9",
     "status": "pending",
-    "created": 1795332498045,
+    "created": 1795367361728,
     "caller": "https://overlap-ana.vercel.app",
+    "verified": true,
     "start": "2026-11-26T14:30:00.000Z",
     "end": "2026-11-26T15:00:00.000Z",
     "title": "Pricing sync",
