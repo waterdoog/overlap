@@ -224,8 +224,11 @@ knows Ana's page; Bo's acceptance yields an `.ics` invite for that window; and n
 Bo's or Cy's reached Ana's chat. With `--scripted` the whole run takes about 20 seconds and costs
 nothing, so it can run on every change; we also ran it with Gemini behind a local router.
 
-Real model: 6 of 7 full runs with Gemini passed all 18 checks; the one failure was our local
-development router crashing (see `eval/real-model/README.md`). Each full flow is about 15 model calls.
+Real model (Gemini): 29 of 32 full runs passed all 18 checks. Local pages 6 of 7
+(`eval/real-model/`), signed assertions across the live pages 4 of 5 (`eval/real-model-signed/`),
+hosted mode 19 of 20 (`eval/real-model-hosted/`). The failures: our local router crashed once, a
+slow model hit the reference runtime's fixed 90-second limit per message once, and the provider
+returned an error once; none sent a wrong request. Each full flow is about 15 model calls.
 
 `dev/script-router.mjs` is useful beyond Overlap: any open agentic site can test its partner calls,
 bridges and write windows against it without a model or a key.
