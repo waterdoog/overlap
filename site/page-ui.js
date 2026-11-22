@@ -155,8 +155,18 @@ function ownerControls() {
     dialog.close(); $("#owner-form").reset();
   });
   $("#sign-out").addEventListener("click", () => page.signOut());
-  // Hosted pages (under /u/<id>/) can be deleted by their owner, with everything stored.
+  // Hosted pages (under /u/<id>/) can be deleted by their owner, with everything stored,
+  // and can refresh their busy times from a calendar file read in this browser.
   if (/\/u\/[^/]+\/$/.test(location.pathname)) {
+    $("#busy-row").hidden = false;
+    $("#busy-file").addEventListener("change", async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      const { parseIcs, busyIntervals } = await import("./js/calendar.js");
+      const now = Date.now();
+      const busy = busyIntervals(parseIcs(await f.text(), page.profile.timezone), now, now + 120 * 864e5).filter(([, en]) => en > now).slice(0, 5000);
+      const r = await Api.call("POST", "/api/owner/busy", { busy }, { owner: true });
+      $("#busy-msg").textContent = r.ok ? `Updated: ${r.intervals} busy times for the next 120 days. Only start and end times were sent.` : r.reason;
+    });
     $("#delete-page").hidden = false;
     $("#delete-page").addEventListener("click", async () => {
       if (!confirm("Delete this page, its receipts and requests, and the calendar address stored with it? This cannot be undone.")) return;

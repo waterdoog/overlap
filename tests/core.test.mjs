@@ -199,3 +199,23 @@ test("a prober using many signed pages over many days learns at most the weekly 
   const t = answerQuestion({ profile, events: evs[1], state, verifiedPage: "https://trusted.example", now: NOW }, [{ start: "2026-11-26T14:30:00Z", end: "2026-11-26T15:00:00Z" }]);
   assert.equal(t.result.ok, true, "a trusted page is not held by the weekly cap");
 });
+
+test("hosted pages from busy times only: no titles reach the host, owner can refresh", async () => {
+  const { HostedPages, busyToIcs } = await import("../core/hosted.mjs");
+  const stores = {};
+  const registry = new MemoryStore();
+  const hp = new HostedPages({ registry, storeFor: (id) => (stores[id] ||= new MemoryStore()), now: () => NOW, fetchIcs: async () => { throw new Error("must not fetch"); } });
+  const busy = busyIntervals(evs[1], NOW, NOW + 14 * 864e5);
+  const c = (await hp.handle({ method: "POST", path: "/api/pages", origin: "https://h.example", body: { name: "Bo", timezone: "Europe/London", busy, from: "08:30", to: "16:30", days: ["mon", "tue", "wed", "thu"] } })).body;
+  assert.equal(c.ok, true);
+  const reg = await registry.load();
+  assert.equal(JSON.stringify(reg).includes("Board prep"), false, "no titles stored");
+  assert.equal("ics_url" in reg.pages[c.id], false);
+  const ans = (await hp.handle({ method: "POST", path: `/u/${c.id}/api/check`, origin: "https://h.example", ip: "9.9.9.9", body: { windows: [{ start: "2026-11-26T14:00:00Z", end: "2026-11-26T14:30:00Z" }, { start: "2026-11-26T14:30:00Z", end: "2026-11-26T15:00:00Z" }] } })).body;
+  assert.deepEqual(ans.answers.map((a) => a.available), [false, true]);
+  const up = (await hp.handle({ method: "POST", path: `/u/${c.id}/api/owner/busy`, origin: "https://h.example", headers: { authorization: `Bearer ${c.owner_key}` }, body: { busy: [[Date.parse("2026-11-26T14:30:00Z"), Date.parse("2026-11-26T15:00:00Z")]] } })).body;
+  assert.equal(up.ok, true);
+  const ans2 = (await hp.handle({ method: "POST", path: `/u/${c.id}/api/check`, origin: "https://h.example", ip: "9.9.9.8", body: { windows: [{ start: "2026-11-26T14:30:00Z", end: "2026-11-26T15:00:00Z" }] } })).body;
+  assert.equal(ans2.answers[0].available, false, "refreshed busy times apply");
+  assert.match(busyToIcs([[0, 60000]]), /DTSTART:19700101T000000Z/);
+});

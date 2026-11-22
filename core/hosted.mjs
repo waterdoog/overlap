@@ -40,6 +40,14 @@ export class HostedPages {
     if (!m) return { status: 404, body: { ok: false, reason: "Not found." } };
     const server = await this.serverFor(m[1]);
     if (!server) return { status: 404, body: { ok: false, reason: "No such page." } };
+    if (method === "POST" && m[2] === "/api/owner/busy") {
+      if (!server.isOwner(headers)) return { status: 401, body: { ok: false, reason: "This needs the owner key." } };
+      const busy = cleanBusy(body.busy, this.now());
+      if (busy.reason) return { status: 400, body: { ok: false, reason: busy.reason } };
+      await this.registry.update((reg) => { const r = reg.pages?.[m[1]]; if (r) { r.busy = busy.list; delete r.ics_url; } });
+      this.servers.delete(m[1]);
+      return { status: 200, body: { ok: true, intervals: busy.list.length } };
+    }
     return server.handle({ method, path: m[2], query, headers, body, ip, base: `${origin}/u/${m[1]}` });
   }
 
@@ -50,7 +58,7 @@ export class HostedPages {
     if (!rec) return null;
     const server = new OwnerServer({
       profile: rec.profile, store: this.storeFor(id), ownerKeyHash: rec.owner_key_hash, signingSecret: rec.signing_seed,
-      loadCalendar: () => this.fetchIcs(rec.ics_url, this.allowPrivate), now: this.now,
+      loadCalendar: () => (rec.busy ? busyToIcs(rec.busy) : this.fetchIcs(rec.ics_url, this.allowPrivate)), now: this.now,
     });
     server.onDelete = () => this.remove(id);
     this.servers.set(id, server);
@@ -68,6 +76,7 @@ export class HostedPages {
     const name = String(body.name || "").trim().slice(0, 60);
     const timezone = String(body.timezone || "").trim();
     const icsUrl = String(body.ics_url || "").trim();
+    const busyGiven = Array.isArray(body.busy);
     if (!name) return bad("Enter your name.");
     try { new Intl.DateTimeFormat("en", { timeZone: timezone }); } catch { return bad("Pick a valid time zone."); }
     if (!timezone) return bad("Pick a valid time zone.");
@@ -75,10 +84,18 @@ export class HostedPages {
     if (!/^\d{2}:\d{2}$/.test(from) || !/^\d{2}:\d{2}$/.test(to) || from >= to) return bad("Working hours must look like 09:00 to 17:00.");
     const days = (Array.isArray(body.days) && body.days.length ? body.days : ["mon", "tue", "wed", "thu", "fri"]).filter((d) => DAYS.includes(d));
     if (!days.length) return bad("Pick at least one working day.");
-    // Fetch the calendar once now, so a wrong address fails here, not when someone asks.
-    let events;
-    try { events = parseIcs(await this.fetchIcs(icsUrl, this.allowPrivate), timezone); }
-    catch (e) { return bad(`Could not read that calendar address (${e.message}). Use the private iCal address from your calendar's settings.`); }
+    // Either busy times only (read from a calendar file in the owner's browser; the host never
+    // sees titles, places or notes), or a private iCal address the server reads to stay in sync.
+    let events, busy = null;
+    if (busyGiven) {
+      busy = cleanBusy(body.busy, this.now());
+      if (busy.reason) return bad(busy.reason);
+      events = busy.list;
+    } else {
+      // Fetch the calendar once now, so a wrong address fails here, not when someone asks.
+      try { events = parseIcs(await this.fetchIcs(icsUrl, this.allowPrivate), timezone); }
+      catch (e) { return bad(`Could not read that calendar address (${e.message}). Use the private iCal address from your calendar's settings.`); }
+    }
     const ipKey = createHash("sha256").update(`create:${ip}`).digest("hex").slice(0, 12);
     const day = new Date(this.now()).toISOString().slice(0, 10);
     const ownerKey = randomBytes(18).toString("base64url");
@@ -91,7 +108,7 @@ export class HostedPages {
       reg.creations.push({ day, ip: ipKey });
       const hours = Object.fromEntries(days.map((d) => [d, [from, to]]));
       reg.pages[id] = {
-        created: this.now(), ics_url: icsUrl, signing_seed: randomBytes(32).toString("hex"),
+        created: this.now(), ...(busy ? { busy: busy.list } : { ics_url: icsUrl }), signing_seed: randomBytes(32).toString("hex"),
         owner_key_hash: createHash("sha256").update(ownerKey).digest("hex"),
         profile: {
           id, name, timezone, headline: String(body.headline || "").slice(0, 80), org: String(body.org || "").slice(0, 80),
@@ -111,6 +128,26 @@ export class HostedPages {
 }
 
 function bad(reason) { return { status: 400, body: { ok: false, reason } }; }
+
+// Busy intervals uploaded by the owner's browser: [[startMs, endMs], ...], nothing else.
+export function cleanBusy(raw, now) {
+  if (!Array.isArray(raw)) return { reason: "busy must be a list of [start, end] times." };
+  if (raw.length > 5000) return { reason: "Too many busy times; send the next 120 days at most." };
+  const list = [];
+  for (const iv of raw) {
+    const s = Number(Array.isArray(iv) ? iv[0] : NaN), e = Number(Array.isArray(iv) ? iv[1] : NaN);
+    if (!Number.isFinite(s) || !Number.isFinite(e) || e <= s || e - s > 7 * 864e5) return { reason: "Each busy time needs a start before its end (at most 7 days long)." };
+    if (e < now - 864e5 || s > now + 130 * 864e5) continue;
+    list.push([Math.round(s / 60000) * 60000, Math.round(e / 60000) * 60000]);
+  }
+  return { list: list.sort((a, b) => a[0] - b[0]) };
+}
+
+// Busy intervals as an iCalendar file with no titles, for the policy's calendar reader.
+export function busyToIcs(busy) {
+  const t = (ms) => new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", ...busy.flatMap(([s, e], i) => ["BEGIN:VEVENT", `UID:busy-${i}`, `DTSTART:${t(s)}`, `DTEND:${t(e)}`, "END:VEVENT"]), "END:VCALENDAR"].join("\r\n");
+}
 
 // Fetch a calendar by its private iCal address. Only https, and never a private network
 // address, so the server cannot be pointed at its own network.

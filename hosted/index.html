@@ -19,6 +19,8 @@
     .steps b { display: block; font: 600 15px Fraunces, serif; margin-bottom: 4px; }
     form.create { display: grid; gap: 12px; }
     form.create label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+    form.create label.choice { display: flex; gap: 8px; align-items: flex-start; color: var(--ink); font-size: 14px; margin: 6px 0; }
+    form.create label.choice input { width: auto; margin-top: 3px; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .days { display: flex; flex-wrap: wrap; gap: 8px; }
     form.create .days label { display: inline-flex; gap: 6px; align-items: center; color: var(--ink); font-size: 14px; }
@@ -61,10 +63,18 @@
             <label>To <input name="to" type="time" value="17:00" required></label>
           </div>
         </fieldset>
-        <label>Your calendar's private iCal address
-          <input name="ics_url" type="url" required placeholder="https://calendar.google.com/calendar/ical/…/private-…/basic.ics">
+        <fieldset>
+          <legend class="help">How should your page know when you are busy?</legend>
+          <label class="choice"><input type="radio" name="source" value="file" checked> <span><b>Busy times only</b> (recommended): pick a calendar file (.ics). Your browser reads it and sends only start and end times; titles, places, people and notes never leave this computer. Re-upload when your week changes.</span></label>
+          <label class="choice"><input type="radio" name="source" value="url"> <span><b>Stay in sync</b>: your calendar's private iCal address. This server then reads your events (only to answer yes or no; never shown or shared).</span></label>
+        </fieldset>
+        <label id="file-row">Calendar file (.ics)
+          <input name="ics_file" type="file" accept=".ics,text/calendar">
         </label>
-        <p class="help">Google Calendar: Settings → your calendar → Integrate calendar → <i>Secret address in iCal format</i>. Outlook: Settings → Calendar → Shared calendars → Publish a calendar → ICS link. Anyone with this address can read your calendar, so it is never shown on your page or sent to anyone; this server only uses it to answer yes or no. You can delete your page, and everything stored with it, at any time.</p>
+        <label id="url-row" hidden>Your calendar's private iCal address
+          <input name="ics_url" type="url" placeholder="https://calendar.google.com/calendar/ical/…/private-…/basic.ics">
+        </label>
+        <p class="help">Get a file: Google Calendar → Settings → Import &amp; export → Export; Outlook → Calendar → Save calendar (or Publish a calendar as ICS, "Can view when I'm busy" for busy times only). Get an address: Google Calendar → your calendar → Integrate calendar → <i>Secret address in iCal format</i>. You can delete your page, and everything stored with it, at any time.</p>
         <label>A line about you (optional) <input name="about" maxlength="300"></label>
         <label>Topics people can ask you about (optional, comma-separated) <input name="topics" maxlength="200"></label>
         <p id="err" class="field-error" role="alert" hidden></p>
@@ -83,7 +93,12 @@
     <p class="help">Overlap pages are open agentic web sites: each has its own agent manifest, networks and answer rules. You can also run your own copy on your own domain; see the project's README.</p>
   </main>
   <script type="module">
+    import { parseIcs, busyIntervals } from "./u/assets/js/calendar.js";
     const form = document.querySelector("#create");
+    for (const r of form.querySelectorAll("input[name=source]")) r.addEventListener("change", () => {
+      const file = form.source.value === "file";
+      document.querySelector("#file-row").hidden = !file; document.querySelector("#url-row").hidden = file;
+    });
     form.timezone.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const days = [["mon", "Mon"], ["tue", "Tue"], ["wed", "Wed"], ["thu", "Thu"], ["fri", "Fri"], ["sat", "Sat"], ["sun", "Sun"]];
     document.querySelector("#days").innerHTML = days.map(([v, t], i) => `<label><input type="checkbox" name="days" value="${v}" ${i < 5 ? "checked" : ""}> ${t}</label>`).join("");
@@ -92,8 +107,19 @@
       const err = document.querySelector("#err");
       err.hidden = true;
       const fd = new FormData(form);
-      const body = Object.fromEntries(["name", "headline", "org", "timezone", "from", "to", "ics_url", "about", "topics"].map((k) => [k, fd.get(k) || ""]));
+      const body = Object.fromEntries(["name", "headline", "org", "timezone", "from", "to", "about", "topics"].map((k) => [k, fd.get(k) || ""]));
       body.days = fd.getAll("days");
+      if (form.source.value === "file") {
+        const f = form.ics_file.files[0];
+        if (!f) { err.textContent = "Pick a calendar file (.ics)."; err.hidden = false; return; }
+        // Read here; send only [start, end] pairs for the next 120 days.
+        const events = parseIcs(await f.text(), body.timezone || "UTC");
+        const now = Date.now();
+        body.busy = busyIntervals(events, now, now + 120 * 864e5).filter(([s, e]) => e > now).slice(0, 5000);
+      } else {
+        body.ics_url = fd.get("ics_url") || "";
+        if (!body.ics_url) { err.textContent = "Paste your calendar's private iCal address."; err.hidden = false; return; }
+      }
       const btn = form.querySelector("button[type=submit]");
       btn.disabled = true; btn.textContent = "Reading your calendar…";
       let r;

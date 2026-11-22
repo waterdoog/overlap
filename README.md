@@ -133,8 +133,13 @@ agentic site of their own (manifest, both networks, bridge, signing key, answer 
 signed in as owner. The spec allows a site base to be a path, so other pages call
 `https://<host>/u/<id>/overlap_pass` like any other.
 
-What the host keeps for each page: the profile, the iCal address (read only by the server, to
-answer yes or no; never published), a hash of the owner key, a signing seed, receipts and requests.
+Two ways to tell the host when you are busy. **Busy times only** (the default): the start page reads
+a calendar file in your browser and sends only start and end times; titles, places, people and notes
+never leave your computer, and the owner panel can refresh them from a new file. **Stay in sync**:
+a private iCal address, which the server reads only to answer yes or no.
+
+What the host keeps for each page: the profile, the busy times or the iCal address (never
+published), a hash of the owner key, a signing seed, receipts and requests.
 The owner can delete the page and all of it. Calendar addresses must be https and may not point at a
 private network.
 

@@ -15,7 +15,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ChromeLauncher } from "./chrome_launcher.mjs";
 import { CdpClient } from "./cdp_client.mjs";
-import { parseIcs } from "../../core/calendar.mjs";
+import { parseIcs, busyIntervals } from "../../core/calendar.mjs";
 import { isFree } from "../../core/policy.mjs";
 
 const ROOT = resolve(fileURLToPath(new URL("../..", import.meta.url)));
@@ -55,7 +55,9 @@ async function createHostedPages() {
     const prof = JSON.parse(readFileSync(join(ROOT, "personas", `${p}.json`), "utf8"));
     const h = prof.working_hours.mon;
     const r = await (await fetch("http://localhost:9200/api/pages", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: prof.name, headline: prof.headline, org: prof.org, timezone: prof.timezone, from: h[0], to: h[1], days: Object.keys(prof.working_hours), ics_url: `http://localhost:9299/${p}.ics` }) })).json();
+      // Cy's page is made from busy times only (as the start page sends them); the others from an iCal address.
+      body: JSON.stringify({ name: prof.name, headline: prof.headline, org: prof.org, timezone: prof.timezone, from: h[0], to: h[1], days: Object.keys(prof.working_hours),
+        ...(p === "cy" ? { busy: busyIntervals(parseIcs(readFileSync(join(ROOT, "personas", "cy.ics"), "utf8"), prof.timezone), Date.now(), Date.now() + 120 * 864e5) } : { ics_url: `http://localhost:9299/${p}.ics` }) }) })).json();
     if (!r.ok) throw new Error(`create ${p}: ${r.reason}`);
     BASE[p] = r.page_url.replace(/\/$/, ""); KEY[p] = r.owner_key;
   }
