@@ -25,7 +25,7 @@
   ],
   "headers": [
     {
-      "source": "/u/:id/(agent-manifest.json|links.json|agent-mcp.json|overlap_home.network.json|overlap_pass.network.json|bridge/(.*)|runtime/(.*)|js/(.*))",
+      "source": "/u/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
