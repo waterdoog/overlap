@@ -1,0 +1,11 @@
+{
+  "networks": [
+    {
+      "name": "overlap_home"
+    }
+  ],
+  "actions": {
+    "version": 1,
+    "module": "./bridge-actions.js"
+  }
+}

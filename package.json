@@ -1,0 +1,15 @@
+{
+  "name": "overlap",
+  "private": true,
+  "description": "Find a meeting time across people and companies without anyone sharing their calendar: an open agentic web page that answers other agents only yes or no.",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test tests/core.test.mjs",
+    "build:check": "node dev/build.mjs --check"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.9.0"
+  }
+}

@@ -1,0 +1,5 @@
+busy share 0.6-0.85; scenarios with a common 30-minute window: 78 of 400
+policy    found  95% CI          rounds(found)  slots learned per person (of 80 in the week)
+strict     98.7% [93.1, 99.8]     1.27         6.9   (1 stopped by budget)
+helpful    96.2% [89.3, 98.7]     1.21         6.9   (3 stopped by budget)
+freebusy  100.0% [95.3, 100.0]    1.00         80.0

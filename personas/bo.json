@@ -1,0 +1,60 @@
+{
+  "id": "bo",
+  "name": "Bo Okafor",
+  "headline": "Engineering Manager, Platform",
+  "org": "Globex, London",
+  "timezone": "Europe/London",
+  "color": "#8a4b2a",
+  "about": "I lead the platform team at Globex. Ask me about on-call design, incident reviews and developer tooling.",
+  "topics": [
+    "platform engineering",
+    "incident reviews",
+    "developer tooling"
+  ],
+  "public_hours": "Mon–Thu 08:30–16:30, Fri 09:00–12:00 London time",
+  "working_hours": {
+    "mon": [
+      "08:30",
+      "16:30"
+    ],
+    "tue": [
+      "08:30",
+      "16:30"
+    ],
+    "wed": [
+      "08:30",
+      "16:30"
+    ],
+    "thu": [
+      "08:30",
+      "16:30"
+    ],
+    "fri": [
+      "09:00",
+      "12:00"
+    ]
+  },
+  "protected": [],
+  "buffer_minutes": 0,
+  "max_meetings_per_day": 6,
+  "answer_mode": "strict",
+  "budget": {
+    "max_windows_per_question": 6,
+    "per_caller_per_day": 18,
+    "total_per_day": 60,
+    "per_ip_per_day": 12,
+    "anonymous_total_per_day": 24,
+    "horizon_days": 21
+  },
+  "calendar": {
+    "ics_file": "personas/bo.ics"
+  },
+  "dev_owner_key": "bo-owner-dev",
+  "demo": {
+    "owner_key": "bo-owner-dev",
+    "people": [
+      "http://localhost:8101/",
+      "http://localhost:8103/"
+    ]
+  }
+}

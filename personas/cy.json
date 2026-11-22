@@ -1,0 +1,60 @@
+{
+  "id": "cy",
+  "name": "Cy Tanaka",
+  "headline": "Assistant Professor, Machine Learning",
+  "org": "University of Toronto",
+  "timezone": "America/Toronto",
+  "color": "#4b3f8a",
+  "about": "I work on evaluation of multi-agent systems. Students and collaborators: ask my page for a time.",
+  "topics": [
+    "multi-agent evaluation",
+    "benchmarks",
+    "supervision"
+  ],
+  "public_hours": "Mon–Fri 09:00–17:00 Toronto time",
+  "working_hours": {
+    "mon": [
+      "09:00",
+      "17:00"
+    ],
+    "tue": [
+      "09:00",
+      "17:00"
+    ],
+    "wed": [
+      "09:00",
+      "17:00"
+    ],
+    "thu": [
+      "09:00",
+      "17:00"
+    ],
+    "fri": [
+      "09:00",
+      "17:00"
+    ]
+  },
+  "protected": [],
+  "buffer_minutes": 0,
+  "max_meetings_per_day": 6,
+  "answer_mode": "strict",
+  "budget": {
+    "max_windows_per_question": 6,
+    "per_caller_per_day": 18,
+    "total_per_day": 60,
+    "per_ip_per_day": 12,
+    "anonymous_total_per_day": 24,
+    "horizon_days": 21
+  },
+  "calendar": {
+    "ics_file": "personas/cy.ics"
+  },
+  "dev_owner_key": "cy-owner-dev",
+  "demo": {
+    "owner_key": "cy-owner-dev",
+    "people": [
+      "http://localhost:8101/",
+      "http://localhost:8102/"
+    ]
+  }
+}

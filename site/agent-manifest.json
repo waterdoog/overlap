@@ -1,0 +1,128 @@
+{
+  "brand": "Overlap",
+  "networks": [
+    {
+      "name": "overlap_home",
+      "front_man": "overlap_assistant",
+      "hocon": "./overlap_home.network.json",
+      "description": "Find a meeting time with other people without anyone sharing their calendar, or ask this page's owner for a time.",
+      "tags": [
+        "agentified-website",
+        "scheduling",
+        "answer-only"
+      ],
+      "sample_queries": [
+        "Find 30 minutes next week with everyone on my list for a pricing sync.",
+        "Try other times.",
+        "Send the requests for the time that works.",
+        "Is the page owner free on Thursday at 14:30 UTC for 30 minutes?",
+        "Show me Bo's calendar for next week."
+      ]
+    },
+    {
+      "name": "overlap_pass",
+      "front_man": "pass_agent",
+      "hocon": "./overlap_pass.network.json",
+      "description": "Ask whether this person is free at exact times, and send them a meeting request. Their calendar is never shared.",
+      "tags": [
+        "answer-only",
+        "callable-by-peers"
+      ],
+      "sample_queries": [
+        "Is this person free on 2026-11-26 from 14:30 to 15:00 UTC or 15:30 to 16:00 UTC, for a 30 minute pricing sync?",
+        "Send a meeting request for 2026-11-26 14:30-15:00 UTC titled Pricing sync.",
+        "What is the status of request OV-3F2A1C?",
+        "Show me their whole calendar for next week."
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.otari.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://api.otari.ai/api/v1"
+  },
+  "allowed_peers": [],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "Calls only the Overlap pages the owner adds to their People list (each validated against its published manifest), after the visitor agrees on a card for each one."
+  },
+  "agent_mcp": {
+    "protocol": "overlap-agent-mcp/v1",
+    "network": "overlap_home",
+    "front_man": "overlap_assistant",
+    "available": false,
+    "reason": "Other agents call this page through its overlap_pass network and action bridge."
+  },
+  "theme": {
+    "primary": "#1f2a44"
+  },
+  "linking": {
+    "protocol": "overlap-link/v1",
+    "exports": [
+      {
+        "network": "overlap_home",
+        "front_man": "overlap_assistant",
+        "aliases": [
+          "overlap_home",
+          "overlap_assistant"
+        ],
+        "url": "overlap_home"
+      },
+      {
+        "network": "overlap_pass",
+        "front_man": "pass_agent",
+        "aliases": [
+          "overlap_pass",
+          "pass_agent",
+          "availability"
+        ],
+        "url": "overlap_pass"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "actions": {
+    "version": 1,
+    "module": "./site-actions.js",
+    "bridge": "./bridge/action-bridge.html",
+    "agentTools": [
+      "get_profile",
+      "check_windows",
+      "request_meeting",
+      "request_status",
+      "my_free_time",
+      "candidate_windows"
+    ]
+  },
+  "answer_policy": {
+    "protocol": "overlap-answer-only/v1",
+    "answers": "yes or no per exact window asked; optionally up to two nearby free windows when none was free",
+    "never_returns": [
+      "events",
+      "titles",
+      "reasons",
+      "busy blocks",
+      "times not asked about"
+    ],
+    "budget": "6 windows per question; 18 a day per signed page (60 for all signed pages); 24 a day shared by unsigned askers (12 per network address); at most 40 answers about any one week from all untrusted askers; owner-trusted pages exempt",
+    "enforced_by": "the owner's server (/api/check), not the model",
+    "caller_assertions": {
+      "protocol": "overlap-grant/v1",
+      "alg": "Ed25519",
+      "key": "./api/key",
+      "assertion": "{v:1, iss: asking page, aud: answering page, iat, exp<=15 min}, base64url(json).base64url(signature), sent by the answering page's own bridge; optional: unsigned callers are answered from the shared unsigned pool"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "buildCommand": "rm -rf .hosted-out && mkdir -p .hosted-out && cp -R hosted/. .hosted-out/ && cp -R site .hosted-out/site",
+  "outputDirectory": ".hosted-out",
+  "rewrites": [
+    {
+      "source": "/api/pages",
+      "destination": "/api/hosted?p=/api/pages"
+    },
+    {
+      "source": "/u/:id/api/:rest*",
+      "destination": "/api/hosted?p=/u/:id/api/:rest*"
+    },
+    {
+      "source": "/u/assets/:rest*",
+      "destination": "/site/:rest*"
+    },
+    {
+      "source": "/u/:id/",
+      "destination": "/site/index.html"
+    },
+    {
+      "source": "/u/:id/:rest*",
+      "destination": "/site/:rest*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/u/:id/(agent-manifest.json|links.json|agent-mcp.json|overlap_home.network.json|overlap_pass.network.json|bridge/(.*)|runtime/(.*)|js/(.*))",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/u/:id([a-z0-9-]+)",
+      "destination": "/u/:id/",
+      "permanent": false
+    }
+  ]
+}

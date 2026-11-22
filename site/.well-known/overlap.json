@@ -1,0 +1,28 @@
+{
+  "protocol": "overlap-link/v1",
+  "exports": [
+    {
+      "network": "overlap_home",
+      "front_man": "overlap_assistant",
+      "aliases": [
+        "overlap_home",
+        "overlap_assistant"
+      ],
+      "url": "overlap_home"
+    },
+    {
+      "network": "overlap_pass",
+      "front_man": "pass_agent",
+      "aliases": [
+        "overlap_pass",
+        "pass_agent",
+        "availability"
+      ],
+      "url": "overlap_pass"
+    }
+  ],
+  "imports": [],
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}

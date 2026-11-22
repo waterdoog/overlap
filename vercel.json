@@ -1,0 +1,10 @@
+{
+  "outputDirectory": "site",
+  "buildCommand": "",
+  "headers": [
+    {
+      "source": "/(agent-manifest.json|links.json|agent-mcp.json|overlap_home.network.json|overlap_pass.network.json|.well-known/(.*)|bridge/(.*)|runtime/(.*)|js/(.*)|styles.css)",
+      "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }]
+    }
+  ]
+}

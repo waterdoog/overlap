@@ -1,0 +1,69 @@
+{
+  "id": "ana",
+  "name": "Ana Lindqvist",
+  "headline": "Head of Product",
+  "org": "Northwind Labs, Stockholm",
+  "timezone": "Europe/Stockholm",
+  "color": "#2f6f5e",
+  "about": "I run product at Northwind Labs. Happy to talk about B2B onboarding, pricing experiments and hiring PMs.",
+  "topics": [
+    "B2B onboarding",
+    "pricing",
+    "hiring product managers"
+  ],
+  "public_hours": "Mon–Fri 09:00–17:00 Stockholm time",
+  "working_hours": {
+    "mon": [
+      "09:00",
+      "17:00"
+    ],
+    "tue": [
+      "09:00",
+      "17:00"
+    ],
+    "wed": [
+      "09:00",
+      "17:00"
+    ],
+    "thu": [
+      "09:00",
+      "17:00"
+    ],
+    "fri": [
+      "09:00",
+      "17:00"
+    ]
+  },
+  "protected": [
+    {
+      "days": [
+        "fri"
+      ],
+      "from": "13:00",
+      "to": "17:00",
+      "label": "Focus time"
+    }
+  ],
+  "buffer_minutes": 0,
+  "max_meetings_per_day": 6,
+  "answer_mode": "helpful",
+  "budget": {
+    "max_windows_per_question": 6,
+    "per_caller_per_day": 18,
+    "total_per_day": 60,
+    "per_ip_per_day": 12,
+    "anonymous_total_per_day": 24,
+    "horizon_days": 21
+  },
+  "calendar": {
+    "ics_file": "personas/ana.ics"
+  },
+  "dev_owner_key": "ana-owner-dev",
+  "demo": {
+    "owner_key": "ana-owner-dev",
+    "people": [
+      "http://localhost:8102/",
+      "http://localhost:8103/"
+    ]
+  }
+}

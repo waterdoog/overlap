@@ -1,0 +1,7 @@
+{
+  "protocol": "overlap-agent-mcp/v1",
+  "network": "overlap_home",
+  "front_man": "overlap_assistant",
+  "available": false,
+  "reason": "Other agents call this page through its overlap_pass network and action bridge."
+}

@@ -1,0 +1,16 @@
+Share of one target week (80 half-hour slots) a prober learns, by day
+setting                                   day1  day2  day3  day7
+free/busy sharing                           100%  100%  100%  100%
+Overlap, 1 signed page, no weekly cap        23%   23%   45%   90%
+Overlap, 10 signed pages, no weekly cap      75%  100%  100%  100%
+Overlap as shipped, 1 signed page            23%   23%   45%   45%
+Overlap as shipped, 10 signed pages          45%   45%   45%   45%
+
+The weekly cap is a dial: what a 10-page prober learns of one week, by cap (any number of days)
+cap   learned
+12    15%
+24    30%
+40    45%
+60    75%
+80    100%
+A cooperative three-person search asks about 6-12 windows per person (eval/simulate.mjs), so a cap of 24-40 leaves room for 2-6 searches a week.
