@@ -184,12 +184,13 @@ One deployment = one person. Set:
 | `PASS_PROFILE` | Your profile JSON (see `personas/ana.json`; leave out `dev_owner_key`) |
 | `CALENDAR_ICS_URL` | Your calendar's private iCal address (Google Calendar: Settings → *Secret address in iCal format*). Read only by your server. |
 | `OWNER_KEY` | A long random string; you type it once in your own browser |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Where receipts and requests are kept |
+| `BLOB_READ_WRITE_TOKEN` | A private Vercel Blob store, where receipts and requests are kept (set for you by `vercel blob create-store --access private`). Upstash Redis (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`) also works. |
 
 `api/page.mjs` is the Vercel function (vercel.json rewrites `/api/*` to it); any Node host works with `core/api.mjs`.
 
-For the hosted site instead: deploy with `vercel.hosted.json` (`api/hosted.mjs`; needs the two
-Upstash variables), or run `node dev/serve-hosted.mjs 8200` locally.
+For the hosted site instead: `node dev/prepare-hosted.mjs && cp vercel.hosted.json vercel.json &&
+vercel deploy --prod` (`api/hosted.mjs`; needs a private Vercel Blob store, or Upstash Redis), or
+run `node dev/serve-hosted.mjs 8200` locally.
 
 ## Tests
 

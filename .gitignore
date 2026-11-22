@@ -3,6 +3,6 @@ tests/e2e/last-run/chrome.log
 site/.manifest-pass.json
 node_modules/
 .vercel/
-.hosted-out/
+hosted-out/
 dev/data-hosted/
 tests/e2e/*/chrome.log

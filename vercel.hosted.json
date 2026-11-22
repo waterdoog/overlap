@@ -1,6 +1,6 @@
 {
-  "buildCommand": "rm -rf .hosted-out && mkdir -p .hosted-out && cp -R hosted/. .hosted-out/ && cp -R site .hosted-out/site",
-  "outputDirectory": ".hosted-out",
+  "buildCommand": "",
+  "outputDirectory": "hosted-out",
   "rewrites": [
     {
       "source": "/api/pages",
