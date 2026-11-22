@@ -71,6 +71,7 @@ export class AssistantMount {
       // answers "not linked" to the agent instead of asking the visitor for a URL.
       booted.engine.onLinkRequired = async () => null;
       AssistantMount.relabel();
+      AssistantMount.consentForSameSitePages();
       AssistantMount.defaultReview = booted.engine.onActionConfirm;
       booted.engine.onActionConfirm = AssistantMount.review;
       AssistantMount.defaultConsent = booted.engine.onConsent;
@@ -119,6 +120,32 @@ export class AssistantMount {
     };
     new MutationObserver(fix).observe(app, { childList: true, subtree: true, characterData: true });
     fix();
+  }
+
+  /**
+   * The runtime asks before contacting another origin, but pages hosted on one site
+   * (/u/<id>/) share an origin, so it would contact them without a card. Ask for those too,
+   * per page, before their network is loaded. (A wrapper around the engine; the runtime
+   * files are unchanged.)
+   */
+  static consentForSameSitePages() {
+    const engine = AssistantMount.engine;
+    const own = new URL("./", import.meta.url).href;
+    const original = engine.resolveRemote.bind(engine);
+    engine.resolveRemote = async (ref, chain, span, manifest) => {
+      let target;
+      try { target = new URL(ref, location.href); } catch { return original(ref, chain, span, manifest); }
+      if (target.origin === location.origin && !target.href.startsWith(own)) {
+        const page = target.href.replace(/\/[^/]*$/, "");
+        const person = App.page.people.find((p) => p.networkUrl === target.href);
+        const decision = await engine.requestConsent({
+          kind: "network", peerLabel: person ? `${person.name}'s page` : page.replace(/^https?:\/\//, ""),
+          peerOrigin: page.replace(/^https?:\/\//, ""), requestText: "", est: { totalTokens: 0 },
+        });
+        if (decision === "decline") throw new Error(`The user declined to contact ${page.replace(/^https?:\/\//, "")}.`);
+      }
+      return original(ref, chain, span, manifest);
+    };
   }
 
   static names(list) {

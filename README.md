@@ -209,7 +209,7 @@ node tests/e2e/run.mjs                       # with a real model behind an OpenA
 
 The end-to-end test signs in as Ana, adds Bo and Cy, asks for a time, approves each consent card,
 sends the requests, fills in each person's window on that person's page, has Bo accept, and then
-checks on Bo's and Cy's servers (16 checks): each was asked at most 6 windows; every receipt names
+checks (18 checks) that a consent card named each person before contact, and on Bo's and Cy's servers: each was asked at most 6 windows; every receipt names
 Ana's page and is **signed** by it; the pending request is for a window all three are free and
 knows Ana's page; Bo's acceptance yields an `.ics` invite for that window; and no event title of
 Bo's or Cy's reached Ana's chat. With `--scripted` the whole run takes about 20 seconds and costs
@@ -223,9 +223,10 @@ bridges and write windows against it without a model or a key.
 - Unsigned askers (visitors, scripts) share 24 answers a day; a script rotating network addresses is
   held by that total, and cannot touch the budget signed pages get. Behind a shared office network,
   unsigned colleagues share the per-address limit; signed pages do not.
-- On the hosted site, pages share one origin, and the reference runtime does not show consent cards
-  between pages of the same site. Assertions, budgets and receipts work the same; for consent cards
-  between people, give each page its own origin (self-hosted, or one subdomain per page).
+- On the hosted site, pages share one origin. The reference runtime asks consent only for other
+  origins, so Overlap's page also asks, per page, before it loads another person's network on the same
+  site. Assertions, budgets and receipts work the same; the browser's origin isolation between hosted
+  pages is weaker than between self-hosted ones (one subdomain per page would fix that).
 - A yes/no answer still leaks one bit per window. The budget limits how many bits per day.
 - Usual working hours are published (owner's choice, `publish_hours`), so assistants do not waste
   budget on 3 a.m. questions.

@@ -161,6 +161,8 @@ async function main() {
     const ics = await (await fetch(`${BASE.bo}/api/invite.ics?ref=${boPending.ref}`)).text();
     checks.push(["bo: accepting yields a .ics invite for that window", ics.includes(`DTSTART:${boPending.start.replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`), ics.split("\r\n").find((l) => l.startsWith("DTSTART")) || "none"]);
   }
+  const turn1 = transcript.slice(0, transcript.findIndex((t, i) => i > 0 && t.startsWith("OWNER:")));
+  for (const who of ["Bo Okafor", "Cy Tanaka"]) checks.push([`a consent card named ${who}'s page before contacting it`, turn1.some((t) => t.startsWith("[clicked] Allow") && t.includes(`${who}'s page`)), HOSTED ? "hosted (same origin)" : "separate origins"]);
   const leaked = transcript.join("\n").match(/Board prep|School pickup|Incident review|Hiring panel|Teaching|Grant review|Therapy|Lab standup/g);
   checks.push(["no event titles of Bo or Cy reached Ana's chat", !leaked, leaked?.join(",") || "none"]);
   writeFileSync(join(OUT, "transcript.txt"), transcript.join("\n\n"));
