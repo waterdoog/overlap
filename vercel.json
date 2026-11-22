@@ -11,5 +11,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:rest*",
+      "destination": "/api/page?p=/api/:rest*"
+    }
   ]
 }

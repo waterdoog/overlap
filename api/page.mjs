@@ -1,5 +1,5 @@
 // Hosted entry point (Vercel Node function) for one person's Overlap page.
-// Static files are served from site/ (see vercel.json); this handles /api/*.
+// Static files are served from site/; vercel.json rewrites /api/* here with the path in ?p=.
 import { OwnerServer } from "../core/api.mjs";
 import { storeFromEnv } from "../core/store.mjs";
 
@@ -17,13 +17,15 @@ function load() {
 
 export default async function handler(req, res) {
   const url = new URL(req.url, "http://x");
+  const path = url.searchParams.get("p") || url.pathname;
+  url.searchParams.delete("p");
   let body = req.body;
   if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
   const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket?.remoteAddress || "";
-  const out = await load().handle({ method: req.method, path: url.pathname, query: Object.fromEntries(url.searchParams), headers: req.headers, body: body || {}, ip, base: `${req.headers["x-forwarded-proto"] || "https"}://${req.headers["x-forwarded-host"] || req.headers.host}` });
+  const out = await load().handle({ method: req.method, path, query: Object.fromEntries(url.searchParams), headers: req.headers, body: body || {}, ip, base: `${req.headers["x-forwarded-proto"] || "https"}://${req.headers["x-forwarded-host"] || req.headers.host}` });
   if (out.ics) { res.setHeader("Content-Type", "text/calendar; charset=utf-8"); res.setHeader("Cache-Control", "no-store"); res.status(200).send(out.ics); return; }
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
-  if (["/api/profile", "/api/key"].includes(url.pathname)) res.setHeader("Access-Control-Allow-Origin", "*");
+  if (["/api/profile", "/api/key"].includes(path)) res.setHeader("Access-Control-Allow-Origin", "*");
   res.status(out.status).send(JSON.stringify(out.body));
 }

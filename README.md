@@ -186,7 +186,7 @@ One deployment = one person. Set:
 | `OWNER_KEY` | A long random string; you type it once in your own browser |
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Where receipts and requests are kept |
 
-`api/[...path].mjs` is the Vercel function; any Node host works with `core/api.mjs`.
+`api/page.mjs` is the Vercel function (vercel.json rewrites `/api/*` to it); any Node host works with `core/api.mjs`.
 
 For the hosted site instead: deploy with `vercel.hosted.json` (`api/hosted.mjs`; needs the two
 Upstash variables), or run `node dev/serve-hosted.mjs 8200` locally.
