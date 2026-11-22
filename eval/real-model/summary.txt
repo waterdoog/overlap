@@ -1,0 +1,7 @@
+run1 pass=18 fail=0 llm_calls=15 seconds=168
+run2 pass=18 fail=0 llm_calls=15 seconds=202
+run3 pass=18 fail=0 llm_calls=15 seconds=144
+run4 pass=18 fail=0 llm_calls=15 seconds=353
+run5 pass=6 fail=5 llm_calls=20 seconds=101
+run5(retry) pass=18 fail=0 llm_calls=15 seconds=225
+run6(retry) pass=18 fail=0 llm_calls=15 seconds=140
