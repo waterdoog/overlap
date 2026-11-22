@@ -7,3 +7,4 @@ hosted-out/
 dev/data-hosted/
 tests/e2e/*/chrome.log
 .env*
+**/chrome.log
