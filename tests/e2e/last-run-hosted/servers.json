@@ -15,15 +15,15 @@
    "unverified_used_today": 0,
    "used_today": 7,
    "by_site": {
-    "http://localhost:9200/u/ana-lindqvist-0cfb": 7
+    "http://localhost:9200/u/ana-lindqvist-b6e7": 7
    }
   },
   "receipts": [
    {
     "kind": "request",
-    "at": 1795325174722,
-    "caller": "http://localhost:9200/u/ana-lindqvist-0cfb",
-    "page": "http://localhost:9200/u/ana-lindqvist-0cfb",
+    "at": 1795329210789,
+    "caller": "http://localhost:9200/u/ana-lindqvist-b6e7",
+    "page": "http://localhost:9200/u/ana-lindqvist-b6e7",
     "verified": true,
     "ip": "6f65205fab41",
     "purpose": "Pricing sync",
@@ -42,9 +42,9 @@
    },
    {
     "kind": "check",
-    "at": 1795325167980,
-    "caller": "http://localhost:9200/u/ana-lindqvist-0cfb",
-    "page": "http://localhost:9200/u/ana-lindqvist-0cfb",
+    "at": 1795329204058,
+    "caller": "http://localhost:9200/u/ana-lindqvist-b6e7",
+    "page": "http://localhost:9200/u/ana-lindqvist-b6e7",
     "verified": true,
     "trusted": false,
     "ip": "6f65205fab41",
@@ -71,8 +71,8 @@
       "end": "2026-11-26T14:30:00.000Z"
      },
      {
-      "start": "2026-11-27T14:00:00.000Z",
-      "end": "2026-11-27T14:30:00.000Z"
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
      }
     ],
     "answers": [
@@ -90,23 +90,23 @@
   ],
   "requests": [
    {
-    "ref": "OV-943F37",
+    "ref": "OV-B30668",
     "status": "pending",
-    "created": 1795325174722,
+    "created": 1795329210789,
     "caller": "http://localhost:9200",
     "start": "2026-11-26T14:30:00.000Z",
     "end": "2026-11-26T15:00:00.000Z",
     "title": "Pricing sync",
     "from_name": "Ana Lindqvist",
     "from_email": "ana@northwind.example",
-    "from_page": "http://localhost:9200/u/ana-lindqvist-0cfb",
+    "from_page": "http://localhost:9200/u/ana-lindqvist-b6e7",
     "note": "Agenda: Q1 pricing"
    }
   ],
-  "calendar_feed": "/api/calendar.ics?token=d454fd170903850697c5f9e4c30092d0",
+  "calendar_feed": "/api/calendar.ics?token=4c681eda8ff8607f84ae98690326f9f0",
   "grants": {},
   "pages": [
-   "http://localhost:9200/u/ana-lindqvist-0cfb"
+   "http://localhost:9200/u/ana-lindqvist-b6e7"
   ]
  },
  "cy": {
@@ -125,15 +125,15 @@
    "unverified_used_today": 0,
    "used_today": 7,
    "by_site": {
-    "http://localhost:9200/u/ana-lindqvist-0cfb": 7
+    "http://localhost:9200/u/ana-lindqvist-b6e7": 7
    }
   },
   "receipts": [
    {
     "kind": "request",
-    "at": 1795325178753,
-    "caller": "http://localhost:9200/u/ana-lindqvist-0cfb",
-    "page": "http://localhost:9200/u/ana-lindqvist-0cfb",
+    "at": 1795329214770,
+    "caller": "http://localhost:9200/u/ana-lindqvist-b6e7",
+    "page": "http://localhost:9200/u/ana-lindqvist-b6e7",
     "verified": true,
     "ip": "6f65205fab41",
     "purpose": "Pricing sync",
@@ -152,9 +152,9 @@
    },
    {
     "kind": "check",
-    "at": 1795325169179,
-    "caller": "http://localhost:9200/u/ana-lindqvist-0cfb",
-    "page": "http://localhost:9200/u/ana-lindqvist-0cfb",
+    "at": 1795329205243,
+    "caller": "http://localhost:9200/u/ana-lindqvist-b6e7",
+    "page": "http://localhost:9200/u/ana-lindqvist-b6e7",
     "verified": true,
     "trusted": false,
     "ip": "6f65205fab41",
@@ -181,8 +181,8 @@
       "end": "2026-11-26T14:30:00.000Z"
      },
      {
-      "start": "2026-11-27T14:00:00.000Z",
-      "end": "2026-11-27T14:30:00.000Z"
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
      }
     ],
     "answers": [
@@ -191,7 +191,7 @@
      false,
      false,
      false,
-     false
+     true
     ],
     "suggestions": [],
     "cost": 6,
@@ -200,23 +200,23 @@
   ],
   "requests": [
    {
-    "ref": "OV-86FA32",
+    "ref": "OV-03A1F8",
     "status": "pending",
-    "created": 1795325178753,
+    "created": 1795329214770,
     "caller": "http://localhost:9200",
     "start": "2026-11-26T14:30:00.000Z",
     "end": "2026-11-26T15:00:00.000Z",
     "title": "Pricing sync",
     "from_name": "Ana Lindqvist",
     "from_email": "ana@northwind.example",
-    "from_page": "http://localhost:9200/u/ana-lindqvist-0cfb",
+    "from_page": "http://localhost:9200/u/ana-lindqvist-b6e7",
     "note": "Agenda: Q1 pricing"
    }
   ],
-  "calendar_feed": "/api/calendar.ics?token=f2afd76109201ac1e0b6fb5f039300af",
+  "calendar_feed": "/api/calendar.ics?token=aa8efe7245b06a408720635fc7ff42c1",
   "grants": {},
   "pages": [
-   "http://localhost:9200/u/ana-lindqvist-0cfb"
+   "http://localhost:9200/u/ana-lindqvist-b6e7"
   ]
  }
 }

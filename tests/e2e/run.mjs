@@ -58,6 +58,20 @@ async function createHostedPages() {
       // Cy's page is made from busy times only (as the start page sends them); the others from an iCal address.
       body: JSON.stringify({ name: prof.name, headline: prof.headline, org: prof.org, timezone: prof.timezone, from: h[0], to: h[1], days: Object.keys(prof.working_hours),
         ...(p === "cy" ? { busy: busyIntervals(parseIcs(readFileSync(join(ROOT, "personas", "cy.ics"), "utf8"), prof.timezone), Date.now(), Date.now() + 120 * 864e5) } : { ics_url: `http://localhost:9299/${p}.ics` }) }) })).json();
+    // Hosted profiles have no protected blocks; add the persona's (Ana's Friday focus time) as busy.
+    if (r.ok && prof.protected?.length) {
+      const busy = busyIntervals(parseIcs(readFileSync(join(ROOT, "personas", `${p}.ics`), "utf8"), prof.timezone), Date.now(), Date.now() + 120 * 864e5);
+      for (let d = 0; d < 120; d++) {
+        const day = new Date(Date.now() + d * 864e5);
+        const dow = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(day.toLocaleString("en-US", { timeZone: prof.timezone })).getDay()];
+        for (const blk of prof.protected.filter((b) => b.days.includes(dow))) {
+          const ymd = new Intl.DateTimeFormat("en-CA", { timeZone: prof.timezone }).format(day);
+          const at = (hm) => { const [h, m] = hm.split(":").map(Number); const guess = Date.parse(`${ymd}T${hm}:00Z`); const off = Date.parse(new Date(guess).toLocaleString("en-US", { timeZone: prof.timezone })) - Date.parse(new Date(guess).toLocaleString("en-US", { timeZone: "UTC" })); return guess - off; };
+          busy.push([at(blk.from), at(blk.to)]);
+        }
+      }
+      await fetch(`${r.page_url}api/owner/busy`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${r.owner_key}` }, body: JSON.stringify({ busy }) });
+    }
     if (!r.ok) throw new Error(`create ${p}: ${r.reason}`);
     BASE[p] = r.page_url.replace(/\/$/, ""); KEY[p] = r.owner_key;
   }

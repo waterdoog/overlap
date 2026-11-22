@@ -1,0 +1,13 @@
+06:30:32 setup {"s":{"ok":true},"b":true,"c":true,"owner":true,"links":{"person_1":"http://localhost:9200/u/bo-okafor-91c2/overlap_pass","person_2":"http://localhost:9200/u/cy-tanaka-43ff/overlap_pass"}}
+06:30:35 visitor: Find 30 minutes next week with Bo and Cy for a pricing sync.
+06:31:25 clicked: Allow | 🔗 Contact Bo Okafor's page on your behalf? localhost:9200/u/bo-okafor-91c2 Allow Always allow Decline
+06:31:26 clicked: Allow | 🔗 Contact Cy Tanaka's page on your behalf? localhost:9200/u/cy-tanaka-43ff Allow Always allow Decline
+Error: Runtime.evaluate: the browser connection closed.
+    at CdpClient.failAll (file:///Users/chenyu/Desktop/pulse/research/competitions/agenticweb/overlap/tests/e2e/cdp_client.mjs:122:21)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:843:20)
+    at WebSocket.dispatchEvent (node:internal/event_target:776:26)
+    at fireEvent (node:internal/deps/undici/undici:13367:14)
+    at #onSocketClose (node:internal/deps/undici/undici:14625:9)
+    at Socket.onSocketClose (node:internal/deps/undici/undici:14325:72)
+    at Socket.emit (node:events:520:22)
+    at TCP.<anonymous> (node:net:350:12)
