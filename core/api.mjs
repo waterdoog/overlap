@@ -83,7 +83,7 @@ export class OwnerServer {
           case "GET /api/owner/free": return ok(await this.ownerFree(query));
           case "POST /api/owner/decide": return ok(await this.decide(body));
           case "POST /api/owner/settings": return ok(await this.settings(body));
-          case "POST /api/owner/reset": return ok(await this.reset());
+          case "POST /api/owner/reset": return ok(await this.reset(!!body.stats));
           case "POST /api/owner/assertion": return ok(this.assertion(body));
           case "POST /api/owner/grant": return ok(await this.setGrant(body));
           case "POST /api/owner/delete": return this.onDelete ? ok(await this.onDelete()) : { status: 404, body: { ok: false, reason: "Not found." } };
@@ -328,9 +328,9 @@ export class OwnerServer {
     });
   }
 
-  async reset() {
-    // Clears the demo log; anonymous usage counts stay.
-    return this.store.update((state) => { state.receipts = []; state.requests = []; state.grants = {}; return { ok: true }; });
+  async reset(clearStats = false) {
+    // Clears the demo log; anonymous usage counts stay unless the owner asks (e.g. after tests).
+    return this.store.update((state) => { state.receipts = []; state.requests = []; state.grants = {}; if (clearStats) state.stats = {}; return { ok: true }; });
   }
 }
 
