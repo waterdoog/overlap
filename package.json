@@ -2,7 +2,7 @@
   "name": "overlap",
   "private": true,
   "description": "Find a meeting time across people and companies without anyone sharing their calendar: an open agentic web page that answers other agents only yes or no.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "module",
   "engines": { "node": ">=22" },
   "scripts": {

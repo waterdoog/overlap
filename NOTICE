@@ -1,0 +1,9 @@
+Overlap
+Copyright 2026 The Overlap authors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product includes software from https://github.com/cognizant-ai-labs/agentic-web
+(Apache License 2.0): the browser runtime in site/runtime/ (itself based on
+https://github.com/cognizant-ai-lab/nsdeploy), the build tool in tools/agentify-website/,
+and tests/e2e/chrome_launcher.mjs and tests/e2e/cdp_client.mjs. They are unmodified.
