@@ -35,7 +35,7 @@ const json = (t) => { try { return JSON.parse(t); } catch { return null; } };
 // whose text the person's page wrote, ending in "DATA: <json>".
 const receipt = (t) => json(t)?.result ?? null;
 const partnerData = (t) => { const x = json(t); const text = x?.text ?? String(t || ""); const i = text.lastIndexOf("DATA: "); return i >= 0 ? json(text.slice(i + 6)) : null; };
-const NOTE = "_Scripted demo model: no AI, it follows a fixed script so you can see the protocol. Connect a real model in ⚙ AI model settings for the real assistant._";
+const NOTE = "(Scripted demo model: no AI, a fixed script so you can see the protocol. Connect a real model in AI model settings for the real assistant.)";
 
 export function decide(body) {
   const tools = (body.tools || []).map((t) => t.function?.name);

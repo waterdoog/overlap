@@ -10,17 +10,104 @@
    "per_page_per_day": 18,
    "total_per_day": 84,
    "pages_total_per_day": 60,
-   "pages_used_today": 0,
+   "pages_used_today": 7,
    "unverified_total_per_day": 24,
    "unverified_used_today": 0,
-   "used_today": 0,
-   "by_site": {}
+   "used_today": 7,
+   "by_site": {
+    "https://overlap-ana.vercel.app": 7
+   }
   },
-  "receipts": [],
-  "requests": [],
+  "receipts": [
+   {
+    "kind": "request",
+    "at": 1795324171215,
+    "caller": "https://overlap-ana.vercel.app",
+    "page": "https://overlap-ana.vercel.app",
+    "verified": true,
+    "ip": "768c4e62be82",
+    "purpose": "Pricing sync",
+    "asked": [
+     {
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
+     }
+    ],
+    "answers": [
+     true
+    ],
+    "suggestions": [],
+    "cost": 1,
+    "refused": false
+   },
+   {
+    "kind": "check",
+    "at": 1795324163557,
+    "caller": "https://overlap-ana.vercel.app",
+    "page": "https://overlap-ana.vercel.app",
+    "verified": true,
+    "trusted": false,
+    "ip": "768c4e62be82",
+    "purpose": "pricing sync",
+    "asked": [
+     {
+      "start": "2026-11-23T15:00:00.000Z",
+      "end": "2026-11-23T15:30:00.000Z"
+     },
+     {
+      "start": "2026-11-23T15:30:00.000Z",
+      "end": "2026-11-23T16:00:00.000Z"
+     },
+     {
+      "start": "2026-11-25T14:00:00.000Z",
+      "end": "2026-11-25T14:30:00.000Z"
+     },
+     {
+      "start": "2026-11-25T15:30:00.000Z",
+      "end": "2026-11-25T16:00:00.000Z"
+     },
+     {
+      "start": "2026-11-26T14:00:00.000Z",
+      "end": "2026-11-26T14:30:00.000Z"
+     },
+     {
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
+     }
+    ],
+    "answers": [
+     true,
+     true,
+     true,
+     false,
+     false,
+     true
+    ],
+    "suggestions": [],
+    "cost": 6,
+    "refused": false
+   }
+  ],
+  "requests": [
+   {
+    "ref": "OV-05B882",
+    "status": "pending",
+    "created": 1795324171215,
+    "caller": "https://overlap-ana.vercel.app",
+    "start": "2026-11-26T14:30:00.000Z",
+    "end": "2026-11-26T15:00:00.000Z",
+    "title": "Pricing sync",
+    "from_name": "Ana Lindqvist",
+    "from_email": "ana@northwind.example",
+    "from_page": "https://overlap-ana.vercel.app",
+    "note": "Agenda: Q1 pricing"
+   }
+  ],
   "calendar_feed": "/api/calendar.ics?token=86c3b2d0f6e3b0031f67fce8d89ea9e8",
   "grants": {},
-  "pages": []
+  "pages": [
+   "https://overlap-ana.vercel.app"
+  ]
  },
  "cy": {
   "ok": true,
@@ -33,16 +120,103 @@
    "per_page_per_day": 18,
    "total_per_day": 84,
    "pages_total_per_day": 60,
-   "pages_used_today": 0,
+   "pages_used_today": 7,
    "unverified_total_per_day": 24,
    "unverified_used_today": 0,
-   "used_today": 0,
-   "by_site": {}
+   "used_today": 7,
+   "by_site": {
+    "https://overlap-ana.vercel.app": 7
+   }
   },
-  "receipts": [],
-  "requests": [],
+  "receipts": [
+   {
+    "kind": "request",
+    "at": 1795324175314,
+    "caller": "https://overlap-ana.vercel.app",
+    "page": "https://overlap-ana.vercel.app",
+    "verified": true,
+    "ip": "768c4e62be82",
+    "purpose": "Pricing sync",
+    "asked": [
+     {
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
+     }
+    ],
+    "answers": [
+     true
+    ],
+    "suggestions": [],
+    "cost": 1,
+    "refused": false
+   },
+   {
+    "kind": "check",
+    "at": 1795324165921,
+    "caller": "https://overlap-ana.vercel.app",
+    "page": "https://overlap-ana.vercel.app",
+    "verified": true,
+    "trusted": false,
+    "ip": "768c4e62be82",
+    "purpose": "pricing sync",
+    "asked": [
+     {
+      "start": "2026-11-23T15:00:00.000Z",
+      "end": "2026-11-23T15:30:00.000Z"
+     },
+     {
+      "start": "2026-11-23T15:30:00.000Z",
+      "end": "2026-11-23T16:00:00.000Z"
+     },
+     {
+      "start": "2026-11-25T14:00:00.000Z",
+      "end": "2026-11-25T14:30:00.000Z"
+     },
+     {
+      "start": "2026-11-25T15:30:00.000Z",
+      "end": "2026-11-25T16:00:00.000Z"
+     },
+     {
+      "start": "2026-11-26T14:00:00.000Z",
+      "end": "2026-11-26T14:30:00.000Z"
+     },
+     {
+      "start": "2026-11-26T14:30:00.000Z",
+      "end": "2026-11-26T15:00:00.000Z"
+     }
+    ],
+    "answers": [
+     false,
+     false,
+     false,
+     false,
+     false,
+     true
+    ],
+    "suggestions": [],
+    "cost": 6,
+    "refused": false
+   }
+  ],
+  "requests": [
+   {
+    "ref": "OV-6E0B33",
+    "status": "pending",
+    "created": 1795324175314,
+    "caller": "https://overlap-ana.vercel.app",
+    "start": "2026-11-26T14:30:00.000Z",
+    "end": "2026-11-26T15:00:00.000Z",
+    "title": "Pricing sync",
+    "from_name": "Ana Lindqvist",
+    "from_email": "ana@northwind.example",
+    "from_page": "https://overlap-ana.vercel.app",
+    "note": "Agenda: Q1 pricing"
+   }
+  ],
   "calendar_feed": "/api/calendar.ics?token=33083b6a040d02af9ecb3713bca17ad8",
   "grants": {},
-  "pages": []
+  "pages": [
+   "https://overlap-ana.vercel.app"
+  ]
  }
 }

@@ -70,6 +70,7 @@ export class AssistantMount {
       // People are added on the page, never typed into the chat: an unbound person_N slot
       // answers "not linked" to the agent instead of asking the visitor for a URL.
       booted.engine.onLinkRequired = async () => null;
+      AssistantMount.relabel();
       AssistantMount.defaultReview = booted.engine.onActionConfirm;
       booted.engine.onActionConfirm = AssistantMount.review;
       AssistantMount.defaultConsent = booted.engine.onConsent;
@@ -91,6 +92,33 @@ export class AssistantMount {
       console.error("Assistant startup failed", error);
       return null;
     }
+  }
+
+  /**
+   * The runtime labels partners by their manifest brand ("Overlap" for everyone) and calls
+   * any model "real LLM". Name each person instead, and say plainly when the scripted demo
+   * model (no AI) is in use.
+   */
+  static relabel() {
+    const app = document.querySelector("#agent-app");
+    if (!app) return;
+    const fix = () => {
+      for (const node of app.querySelectorAll(".ns-anode")) {
+        const addr = node.querySelector(".ns-aaddr")?.textContent || "";
+        const person = App.page.people.find((p) => addr && addr.replace(/\s/g, "").startsWith(new URL(p.networkUrl).host + new URL(p.networkUrl).pathname.replace(/\/overlap_pass$/, "")));
+        const name = node.querySelector(".ns-aname");
+        if (person && name && name.textContent !== `${person.name}'s page`) name.textContent = `${person.name}'s page`;
+        const role = node.querySelector(".ns-arole");
+        if (role?.textContent === "your concierge" && name && App.page.profile && name.textContent !== `${App.page.profile.name}'s assistant`) name.textContent = `${App.page.profile.name}'s assistant`;
+      }
+      const badge = app.querySelector(".ns-llmbadge");
+      if (badge && AssistantMount.engine?.modelOverride === "scripted" && !badge.textContent.includes("no AI")) {
+        badge.textContent = "● scripted demo (no AI)";
+        badge.title = "A fixed script on this site plays the model, so you can see the protocol without an AI key.";
+      }
+    };
+    new MutationObserver(fix).observe(app, { childList: true, subtree: true, characterData: true });
+    fix();
   }
 
   static names(list) {
